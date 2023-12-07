@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cuestionario Sociodemográfico</title>
+</head>
+<body>
+    <h1>Cuestionario Sociodemográfico</h1>
+    <form action="/submit-sociodemographic" method="post">
+        <label for="name">Nombre y apellido:</label><br>
+        <input type="text" id="name" name="name"><br><br>
+
+        <label for="age">Edad:</label><br>
+        <input type="number" id="age" name="age"><br><br>
+
+        <label for="sex">Sexo:</label><br>
+        <input type="radio" id="male" name="sex" value="Varón">
+        <label for="male">Varón</label><br>
+        <input type="radio" id="female" name="sex" value="Mujer">
+        <label for="female">Mujer</label><br>
+        <input type="radio" id="no_say" name="sex" value="Prefiero no decirlo">
+        <label for="no_say">Prefiero no decirlo</label><br>
+        <input type="radio" id="self_describe" name="sex" value="Prefiero autodescribirme">
+        <label for="self_describe">Prefiero autodescribirme</label><br><br>
+
+        <label for="education">Nivel educativo:</label><br>
+        <select name="education" id="education">
+            <option value="Primaria incompleta">Primaria incompleta</option>
+            <option value="Primaria completa">Primaria completa</option>
+            <option value="Secundaria incompleta">Secundaria incompleta</option>
+            <option value="Secundaria completa">Secundaria completa</option>
+            <option value="Terciaria incompleta">Terciaria incompleta</option>
+            <option value="Terciaria completa">Terciaria completa</option>
+        </select><br><br>
+
+        <label for="country">País de origen:</label><br>
+        <input type="text" id="country" name="country"><br><br>
+
+        <label for="years_in_uruguay">Años en Uruguay (si aplica):</label><br>
+        <input type="number" id="years_in_uruguay" name="years_in_uruguay"><br><br>
+
+        <label for="residence">Departamento de residencia:</label><br>
+        <input type="text" id="residence" name="residence"><br><br>
+
+        <label for="email">Mail:</label><br>
+        <input type="email" id="email" name="email"><br><br>
+
+        <label for="phone">Teléfono:</label><br>
+        <input type="tel" id="phone" name="phone"><br><br>
+
+        <input type="submit" value="Enviar">
+    </form>
+</body>
+</html>

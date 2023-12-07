@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Preguntas Abiertas</title>
+</head>
+<body>
+    <h1>Preguntas Abiertas</h1>
+    <p>A continuación, se te presentan 3 preguntas abiertas. Estando tranquilo/a y ubicado/a en un lugar cómodo, responde libremente a cada una de ellas grabando y enviando una nota de voz desde tu celular.</p>
+
+    <!-- Question 1 -->
+    <p>1. ¿Relata con el mayor detalle posible cómo es para ti un día común y corriente?</p>
+    <button onclick="startRecording(1)">Grabar Respuesta</button>
+    <input type="file" accept="audio/*" id="audioUpload1" style="display:none;">
+    <br>
+
+    <!-- Question 2 -->
+    <p>2. ¿Describe con el mayor detalle posible la situación más extraña que te haya tocado vivir?</p>
+    <button onclick="startRecording(2)">Grabar Respuesta</button>
+    <input type="file" accept="audio/*" id="audioUpload2" style="display:none;">
+    <br>
+
+    <!-- Question 3 -->
+    <p>3. ¿Relata cómo le explicarías a una persona sorda qué es escuchar?</p>
+    <button onclick="startRecording(3)">Grabar Respuesta</button>
+    <input type="file" accept="audio/*" id="audioUpload3" style="display:none;">
+    <br>
+
+    <button onclick="submitAnswers()">Enviar Respuestas</button>
+
+    <script>
+        function startRecording(questionNumber) {
+            // Trigger the file input to upload audio
+            document.getElementById('audioUpload' + questionNumber).click();
+        }
+
+        function submitAnswers() {
+            // Logic to submit the answers (audio files) to the server
+        }
+    </script>
+</body>
+</html>

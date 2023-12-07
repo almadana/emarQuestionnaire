@@ -1,0 +1,3 @@
+CREATE DATABASE canna_emar;
+GRANT ALL PRIVILEGES ON canna_emar.* TO 'cuanti_user'@'localhost';
+FLUSH PRIVILEGES;
