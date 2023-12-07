@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cuestionario sobre Experiencias Traumáticas</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+	<title>Experiencias traumáticas - Estudio sobre efectos del Cannabis</title>
+    <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../static/css/style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link rel="canonical" href="http://digital.psico.edu.uy/cannabis">
 </head>
 <body>
     <h1>Cuestionario sobre Experiencias Traumáticas</h1>
-    <form action="/submit-traumatic-experiences" method="post">
+    <main>
+    <form action="/submit-texp" method="post">
         <p>1. Durante tu infancia: ¿alguien usó la fuerza para para quitarte algo que llevabas o vestías?</p>
         <input type="radio" id="q1_1" name="q1" value="1">
         <label for="q1_1">1 = una vez</label><br>
@@ -474,7 +481,10 @@
         <label for="q36_5">5 = cinco veces o más</label><br>
         <input type="radio" id="q36_0" name="q36" value="0">
         <label for="q36_0">0 = nunca</label><br><br>
+        <center>
         <input type="submit" value="Enviar">
+        </center>
     </form>
+    </main>
 </body>
 </html>

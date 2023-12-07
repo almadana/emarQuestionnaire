@@ -1,32 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Preguntas Abiertas</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+	<title>Cuestionario sobre consumo de Cannabis - Estudio sobre efectos del Cannabis</title>
+    <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../static/css/style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link rel="canonical" href="http://digital.psico.edu.uy/cannabis">
 </head>
 <body>
+<main>
     <h1>Preguntas Abiertas</h1>
     <p>A continuación, se te presentan 3 preguntas abiertas. Estando tranquilo/a y ubicado/a en un lugar cómodo, responde libremente a cada una de ellas grabando y enviando una nota de voz desde tu celular.</p>
 
     <!-- Question 1 -->
-    <p>1. ¿Relata con el mayor detalle posible cómo es para ti un día común y corriente?</p>
+    <p>1. Relata con el mayor detalle posible cómo es para ti un día común y corriente.</p>
     <button onclick="startRecording(1)">Grabar Respuesta</button>
     <input type="file" accept="audio/*" id="audioUpload1" style="display:none;">
     <br>
 
     <!-- Question 2 -->
-    <p>2. ¿Describe con el mayor detalle posible la situación más extraña que te haya tocado vivir?</p>
+    <p>2. Describe con el mayor detalle posible la situación más extraña que te haya tocado vivir.</p>
     <button onclick="startRecording(2)">Grabar Respuesta</button>
     <input type="file" accept="audio/*" id="audioUpload2" style="display:none;">
     <br>
 
     <!-- Question 3 -->
-    <p>3. ¿Relata cómo le explicarías a una persona sorda qué es escuchar?</p>
+    <p>3. Relata cómo le explicarías a una persona sorda qué es la música.</p>
     <button onclick="startRecording(3)">Grabar Respuesta</button>
     <input type="file" accept="audio/*" id="audioUpload3" style="display:none;">
     <br>
 
+    <br>
     <button onclick="submitAnswers()">Enviar Respuestas</button>
 
+</main>
     <script>
         function startRecording(questionNumber) {
             // Trigger the file input to upload audio
@@ -37,5 +46,6 @@
             // Logic to submit the answers (audio files) to the server
         }
     </script>
+
 </body>
 </html>

@@ -7,8 +7,6 @@ app = Flask(__name__)
 
 
 
-# MYSQL
-DB = Sequel.connect('mysql2://digital_user:goU0oLgYwsc4JXiA@localhost/digital')
 
 # MySQL configurations
 app.config['MYSQL_HOST'] = 'mysql2://localhost/digital'
@@ -19,21 +17,22 @@ mysql = MySQL(app)
 
 
 
+# MYSQL
+#DB = mysql.connect('mysql2://digital_user:goU0oLgYwsc4JXiA@localhost/digital')
 
 
 
 if __name__ == '__main__':
     app.run(debug=True)
 
-
-
+#WELCOME / INFORMATION / CONSENT / SOCIODEMO / TRAUMATIC / CANNABIS / SNS / IDEAS REF / SALIENCIA / OPEN Q
 
 @app.route('/')
 def welcome():
     return render_template('welcome.html')
 
 
-@app.route('/information')
+@app.route('/info')
 def information():
     return render_template('information.html')
 
@@ -45,13 +44,13 @@ def consent():
 def submit_consent():
     # Code to handle consent submission
     # Redirect to next part of the study or show a confirmation message
-    return "Consentimiento recibido. ¡Gracias!"
+    return redirect(url_for('sociodemo'))
 
-@app.route('/sociodemographic')
+@app.route('/sociodemo')
 def sociodemographic():
     return render_template('sociodemo.html')
 
-app.route('/submit-sociodemographic', methods=['POST'])
+app.route('/submit-sociodemo', methods=['POST'])
 def submit_sociodemographic():
     try:
         conn = mysql.connector.connect(host='localhost',
@@ -82,38 +81,29 @@ def submit_sociodemographic():
             conn.commit()
             cursor.close()
             conn.close()
-            return 'Data submitted successfully.'
+            return redirect(url_for('texp'))
     except Error as e:
         print("Error while connecting to MySQL", e)
         return 'Failed to submit data.'
 
 
-@app.route('/traumatic-experiences')
+@app.route('/texp')
 def traumatic_experiences():
     return render_template('traumatic_experiences.html')
 
-@app.route('/submit-traumatic-experiences', methods=['POST'])
+@app.route('/submit-texp', methods=['POST'])
 def submit_traumatic_experiences():
     # Code to handle form submission
     # Save data to database or process as needed
-    return "Respuestas recibidas. ¡Gracias!"
-
-@app.route('/traumatic-experiences')
-def traumatic_experiences():
-    return render_template('traumatic_experiences.html')
-
-@app.route('/submit-traumatic-experiences', methods=['POST'])
-def submit_traumatic_experiences():
-    # Code to handle form submission
-    # Save data to database or process as needed
-    return "Respuestas recibidas. ¡Gracias!"
+    return redirect(url_for('cannabis'))
 
 
-@app.route('/cannabis-questionnaire')
+
+@app.route('/cannabis')
 def cannabis_questionnaire():
     return render_template('cannabis_questionnaire.html')
 
-@app.route('/submit-cannabis-questionnaire', methods=['POST'])
+@app.route('/submit-cq', methods=['POST'])
 def submit_cannabis_questionnaire():
     conn = mysql.connection
     cursor = conn.cursor()
@@ -132,14 +122,14 @@ def submit_cannabis_questionnaire():
     conn.commit()
     cursor.close()
 
-    return 'Cannabis questionnaire responses submitted successfully.'
+    return redirect(url_for('sns'))
 
 
 @app.route('/sns-questionnaire')
 def sns_questionnaire():
     return render_template('sns_questionnaire.html')
 
-@app.route('/submit-sns-questionnaire', methods=['POST'])
+@app.route('/submit-sns', methods=['POST'])
 def submit_sns_questionnaire():
     conn = mysql.connection
     cursor = conn.cursor()
@@ -157,14 +147,14 @@ def submit_sns_questionnaire():
     conn.commit()
     cursor.close()
 
-    return 'SNS questionnaire responses submitted successfully.'
+    return redirect(url_for('ideas'))
 
-@app.route('/ideas-ref-questionnaire')
+@app.route('/ideas')
 def ideas_ref_questionnaire():
     return render_template('ref_ideas.html')
 
 
-@app.route('/submit-self-reference-ideas', methods=['POST'])
+@app.route('/submit-ideas', methods=['POST'])
 def submit_self_reference_ideas():
     conn = mysql.connection
     cursor = conn.cursor()
@@ -182,30 +172,15 @@ def submit_self_reference_ideas():
     conn.commit()
     cursor.close()
 
-    return 'Self-Reference Ideas questionnaire responses submitted successfully.'
+    return redirect(url_for('saliencia'))
 
 
 
-
-@app.route('/sns-questionnaire')
-def sns_questionnaire():
-    return render_template('sns.html')
-
-@app.route('/submit-sns-questionnaire', methods=['POST'])
-def submit_sns_questionnaire():
-    # Extract submitted data
-    submitted_data = request.form
-    # Process the data as needed, like storing in a database
-    print(submitted_data)  # For now, just printing the data to console
-
-    return "Respuestas recibidas. ¡Gracias!"
-
-
-@app.route('/saliencia-questionnaire')
+@app.route('/saliencia')
 def saliencia_questionnaire():
     return render_template('saliencia.html')
 
-@app.route('/submit-saliencia-questionnaire', methods=['POST'])
+@app.route('/submit-saliencia', methods=['POST'])
 def submit_saliencia_questionnaire():
     conn = mysql.connection
     cursor = conn.cursor()
@@ -223,11 +198,11 @@ def submit_saliencia_questionnaire():
     conn.commit()
     cursor.close()
 
-    return 'Saliency Scale questionnaire responses submitted successfully.'
+    return redirect(url_for('open'))
 
 
 
-@app.route('/open-questions')
+@app.route('/open')
 def open_questions():
     return render_template('open_questions.html')
 
