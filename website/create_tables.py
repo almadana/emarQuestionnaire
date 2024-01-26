@@ -27,7 +27,7 @@ def create_tables():
             cursor.execute(''' CREATE TABLE IF NOT EXISTS audio_files (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         filename VARCHAR(100),
-                        question_id INT,
+                        q_id VARCHAR(10),
                         participant_id VARCHAR(255),
                         upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ''')
 
@@ -52,20 +52,20 @@ def create_tables():
             cursor.execute(''' CREATE TABLE IF NOT EXISTS cannabis_questionnaire_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     participant_id VARCHAR(255),
-                    question_1_response VARCHAR(255),
-                    question_2_response VARCHAR(255),
-                    question_3_response VARCHAR(255),
-                    question_4_response VARCHAR(255),
-                    question_5_response VARCHAR(255),
-                    question_6_response VARCHAR(255),
-                    question_7_response VARCHAR(255),
-                    question_8_response VARCHAR(255),
-                    question_9_response VARCHAR(255),
+                    q_1 VARCHAR(255),
+                    q_2 VARCHAR(255),
+                    q_3 VARCHAR(255),
+                    q_4 VARCHAR(255),
+                    q_5 VARCHAR(255),
+                    q_6 VARCHAR(255),
+                    q_7 VARCHAR(255),
+                    q_8 VARCHAR(255),
+                    q_9 VARCHAR(255),
                     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
 
 
             nQuest = 36
-            q_strings = ["question_" + str(i) + "_response VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ["q_" + str(i) + " VARCHAR(10)" for i in range(1,nQuest+1)]
             q_strings = ",\n".join(q_strings)
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS traumatic_experiences_responses (
@@ -74,7 +74,7 @@ def create_tables():
 
 
             nQuest = 29
-            q_strings = ["question_" + str(i) + "_response VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ["q_" + str(i) + " VARCHAR(10)" for i in range(1,nQuest+1)]
             q_strings = ",\n".join(q_strings)
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS saliency_scale_responses (
@@ -83,7 +83,7 @@ def create_tables():
 
 
             nQuest = 34
-            q_strings = ["question_" + str(i) + "_response VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ["q_" + str(i) + " VARCHAR(1),\n q" + str(i) + "vof VARCHAR(1)"  for i in range(1,nQuest+1)]
             q_strings = ",\n".join(q_strings)
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS self_reference_ideas_responses (
@@ -92,7 +92,7 @@ def create_tables():
 
 
             nQuest = 20
-            q_strings = ["question_" + str(i) + "_response VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ["q_" + str(i) + " VARCHAR(10)" for i in range(1,nQuest+1)]
             q_strings = ",\n".join(q_strings)
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS sns_questionnaire_responses (

@@ -2,39 +2,119 @@
 <html>
 <head>
     <title>Preguntas Abiertas</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../static/css/style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link rel="canonical" href="http://digital.psico.edu.uy/cannabis">
+
 </head>
 <body>
     <h1>Preguntas Abiertas</h1>
+    <main>
     <p>A continuación, se te presentan 3 preguntas abiertas. Estando tranquilo/a y ubicado/a en un lugar cómodo, responde libremente a cada una de ellas grabando y enviando una nota de voz desde tu celular.</p>
 
-    <!-- Question 1 -->
-    <p>1. ¿Relata con el mayor detalle posible cómo es para ti un día común y corriente?</p>
-    <button onclick="startRecording(1)">Grabar Respuesta</button>
+        <!-- Question 1 -->
+    <p>1. Relata con el mayor detalle posible cómo es para ti un día común y corriente.</p>
+    <button id="recordButton1" onclick="startRecording(1)">Grabar Respuesta</button>
+    <button id="stopButton1" onclick="stopRecording(1)" disabled>Detener Grabación</button>
     <input type="file" accept="audio/*" id="audioUpload1" style="display:none;">
     <br>
 
-
     <!-- Question 3 -->
-    <p>3. ¿Relata cómo le explicarías a una persona sorda qué es escuchar?</p>
-    <button onclick="startRecording(3)">Grabar Respuesta</button>
-    <input type="file" accept="audio/*" id="audioUpload3" style="display:none;">
+    <p>3. Relata cómo le explicarías a una persona sorda qué es escuchar</p>
+    <button id="recordButton2" onclick="startRecording(2)">Grabar Respuesta</button>
+    <button id="stopButton2" onclick="stopRecording(2)" disabled>Detener Grabación</button>
     <br>
-
+    <input type="file" accept="audio/*" id="audioUpload3" style="display:none;">
+    
 </p>
 
     <button onclick="submitAnswers()">Enviar Respuestas</button>
 
 </p> 
 
-    <script>
-        function startRecording(questionNumber) {
-            // Trigger the file input to upload audio
-            document.getElementById('audioUpload' + questionNumber).click();
-        }
+ 
+    
+<script src="https://cdn.WebRTC-Experiment.com/RecordRTC.js"></script>
+<script>
+    let recorders = {};
+    let audioBlobs = {};
 
-        function submitAnswers() {
-            // Logic to submit the answers (audio files) to the server
+    function startRecording(questionNumber) {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            const recorder = new RecordRTC(stream, { type: 'audio', timeSlice: 180000 });
+            recorders[questionNumber] = recorder;
+            recorder.startRecording();
+            
+            document.getElementById('recordButton' + questionNumber).disabled = true;
+            document.getElementById('stopButton' + questionNumber).disabled = false;
+
+            // Automatically stop recording after 3 minutes
+            setTimeout(() => {
+                stopRecording(questionNumber);
+            }, 180000);
+        }).catch(e => {
+            console.error('Could not start recording: ', e);
+        });
+    }
+
+    function stopRecording(questionNumber) {
+        let recorder = recorders[questionNumber];
+        if (recorder) {
+            recorder.stopRecording(() => {
+                let blob = recorder.getBlob();
+                audioBlobs[questionNumber] = blob;
+                
+                // Reset buttons
+                document.getElementById('recordButton' + questionNumber).disabled = false;
+                document.getElementById('stopButton' + questionNumber).disabled = true;
+            });
         }
-    </script>
+    }
+
+   function submitAnswers() {
+        let formData = new FormData();
+
+        // Assuming audioBlobs is an object containing the audio data
+        Object.keys(audioBlobs).forEach(questionNumber => {
+            // Append each audio blob to formData with a key
+            formData.append('audio' + questionNumber, audioBlobs[questionNumber], 'question' + questionNumber + '.wav');
+        });
+
+        fetch('/upload-audio', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // If the upload was successful, you might redirect the user or display a success message
+                alert("Audios enviados correctamente!!");
+                window.location.href = '/gracias'; // Redirect to another page if needed
+            } else {
+                // If the server responded with an error, display it
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => {
+            // Handle any errors that occurred during fetch
+            console.error('Error:', error);
+            alert("Ocurrió un error durante el envío, por favor vuelva a intentarlo en unos segundos...: " + error.message);
+    });
+}
+
+
+</script>
+
+    
+    
+    <main>
 </body>
 </html>

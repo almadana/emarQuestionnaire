@@ -39,7 +39,7 @@ def get_db_connection():
 if __name__ == '__main__':
     app.run(debug=True)
 
-#WELCOME / INFORMATION / CONSENT / SOCIODEMO / TRAUMATIC / CANNABIS / SNS / IDEAS REF / SALIENCIA / OPEN Q
+#WELCOME / INFORMATION / CONSENT / SOCIODEMO / TRAUMATIC / CANNABIS / SNS / IDEAS REF / SALIENCIA / OPEN Q / thanks
 
 @app.route('/')
 def welcome():
@@ -116,15 +116,15 @@ def submit_texp():
         q_responses = [request.form.get("q"+str(i)) for i in range(1,nQuest+1)]
         q_responses.insert(0,participant_id)
 
-        q_strings = ["question_" + str(i) + "_response" for i in range(1,nQuest+1)]
+        q_strings = ["q_" + str(i) for i in range(1,nQuest+1)]
         q_strings = ",".join(q_strings)
         
-        format_strings = ["%s" for i in range(1,nQuest+1)]
+        format_strings = ["%s" for i in range(0,nQuest+1)]
         format_strings = ",".join(format_strings)
 
         # Insert data into the database
         sql = "INSERT INTO traumatic_experiences_responses \n (participant_id, " +  q_strings + """)
-                VALUES (%s,""" + format_strings  + ")"
+                VALUES (""" + format_strings  + ")"
         cursor.execute(sql, tuple(q_responses))
         
         conn.commit()
@@ -155,10 +155,10 @@ def submit_cq():
         q_responses = [request.form.get("q"+str(i)) for i in range(1,nQuest+1)]
         q_responses.insert(0,participant_id)
 
-        q_strings = ["question_" + str(i) + "_response" for i in range(1,nQuest+1)]
+        q_strings = ["q_" + str(i) for i in range(1,nQuest+1)]
         q_strings = ",".join(q_strings)
 
-        format_strings = ["%s" for i in range(1,nQuest+1)]
+        format_strings = ["%s" for i in range(0,nQuest+1)]
         format_strings = ",".join(format_strings)
 
         # Insert data into the database
@@ -168,7 +168,7 @@ def submit_cq():
         conn.commit()        
         cursor.close()
         conn.close()
-        return redirect(url_for('sns-questionnaire'))
+        return redirect(url_for('sns_questionnaire'))
 
     except Error as e:
         print("Error while connecting to MySQL", e)
@@ -194,7 +194,7 @@ def submit_sns():
         q_responses.insert(0, participant_id)
 
         # Continue extracting other fields as per your form
-        q_strings = ["question_" + str(i) + "_response" for i in range(1,nQuest+1)]
+        q_strings = ["q_" + str(i)  for i in range(1,nQuest+1)]
         q_strings = ",".join(q_strings)
 
         format_strings = ["%s" for i in range(0,nQuest+1)]
@@ -235,22 +235,31 @@ def submit_ideas():
         nQuest = 34
         q_responses = [request.form.get("q"+str(i)) for i in range(1,nQuest+1)]
         q_responses.insert(0,participant_id)
-
+        
+        q_vf = [request.form.get( "q"+str(i)+"vof" ) for i in range(1,nQuest+1)]
+        
+        q_responses = q_responses + q_vf
+        
+        print(q_responses)
+        
         # Continue extracting other fields as per your form
-        q_strings = ["question_" + str(i) + "_response" for i in range(1,nQuest+1)]
+        q_strings = ["q_" + str(i) for i in range(1,nQuest+1)]
         q_strings = ",".join(q_strings)
+        
+        qvf_strings = ["q" + str(i) + "vof" for i in range(1,nQuest+1)]
+        qvf_strings = ",".join(qvf_strings)
 
-        format_strings = ["%s" for i in range(0,nQuest+1)]
+        format_strings = ["%s" for i in range(0,(2*nQuest)+1)]
         format_strings = ",".join(format_strings)
-
+                
         # Insert data into the database
-        sql = "INSERT INTO self_reference_ideas_responses \n (participant_id, " +  q_strings + """)
+        sql = "INSERT INTO self_reference_ideas_responses \n (participant_id, " +  q_strings + ", " + qvf_strings  + """)
                 VALUES (""" + format_strings + ")"
         cursor.execute(sql, tuple(q_responses))
         conn.commit()
         cursor.close()
         conn.close()
-        return redirect(url_for('saliencia'))
+        return redirect(url_for('saliencia_questionnaire'))
 
     except Error as e:
         print("Error while connecting to MySQL", e)
@@ -258,7 +267,7 @@ def submit_ideas():
 
 
 
-@app.route('/saliencia')
+@app.route('/saliencia-questionnaire')
 def saliencia_questionnaire():
     return render_template('saliencia.html')
 
@@ -267,71 +276,94 @@ def submit_saliencia_questionnaire():
 
     participant_id = session["participant_id"]
 
-    conn = mysql.connection
-    cursor = conn.cursor()
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()    
 
-    # Extracting form data - 29 questions
-    nQuest = 29
-    q_responses = [request.form.get("q"+str(i)) for i in range(1,nQuest+1)]
-    q_responses.insert(0,participant_id)
+        # Extracting form data - 29 questions
+        nQuest = 29
+        q_responses = [request.form.get("q"+str(i)) for i in range(1,nQuest+1)]
+        q_responses.insert(0,participant_id)
 
-    format_strings = ["%s" for i in range(0,nQuest+1)]
-    format_strings = ",".join(format_strings)
+        format_strings = ["%s" for i in range(0,nQuest+1)]
+        format_strings = ",".join(format_strings)
 
-    # Continue extracting other fields as per your form
-    q_strings = ["question_" + str(i) + "_response" for i in range(1,nQuest+1)]
-    q_strings = ",".join(q_strings)
-    # Insert data into the database
-    sql = "INSERT INTO saliency_scale_responses \n (participant_id, " +  q_strings + """)
-             VALUES (""" + format_strings  + ")"
-    cursor.execute(sql, tuple(q_responses))
-    conn.commit()
-    cursor.close()
+        # Continue extracting other fields as per your form
+        q_strings = ["q_" + str(i) for i in range(1,nQuest+1)]
+        q_strings = ",".join(q_strings)
+        # Insert data into the database
+        sql = "INSERT INTO saliency_scale_responses \n (participant_id, " +  q_strings + """)
+                VALUES (""" + format_strings  + ")"
+        cursor.execute(sql, tuple(q_responses))
+        conn.commit()
+        cursor.close()
+        conn.close()
 
-    return redirect(url_for('open'))
+        return redirect(url_for('open'))
+    except Error as e:
+        print("Error while connecting to MySQL", e)
+        return 'Failed to submit data.'
 
 
 
 @app.route('/open')
-def open_questions():
-    return render_template('open_questions.html')
+def open():
+    return render_template('open.html')
 
 
 def allowed_file(filename):
     """Check if the file has one of the allowed extensions and MIME types."""
     allowed_extension = '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-    allowed_mime = magic.from_file(filename, mime=True).startswith('audio/')
+    allowed_mime = magic.from_file(filename, mime=True) in ['audio/wav', 'video/webm']
+
+    print(allowed_extension)
+    print(allowed_mime)
     return allowed_extension and allowed_mime
+
+
 
 
 @app.route('/upload-audio', methods=['POST'])
 def upload_audio():
-    # You can access the uploaded audio file with request.files['file']
-    participant_id = session["participant_id"]
-    if 'audio' not in request.files:
-        return jsonify({"error": "No hay audio"}), 400
+    response = {"success": False}
+    try:
+        participant_id = session.get("participant_id")
 
-    audio_file = request.files.get('audio')
-    if audio_file:
-        # Save the audio file or process it as needed
-        filename = secure_filename(audio_file.filename)
-        if allowed_file(audio_file):
-            audio_file.save(os.path.join('data/audio/', filename))
+        for key in request.files:
+            audio_file = request.files[key]
+            print(audio_file.filename)
+            if audio_file:
+                file_extension = audio_file.filename.rsplit('.', 1)[1].lower()
+                new_filename = f"{participant_id}_{key}.{file_extension}"
+                temp_path = os.path.join('temp/', new_filename)
+                audio_file.save(temp_path)  # Temporarily save file
+                if allowed_file(temp_path):  # Check MIME type
+                    final_path = os.path.join('data/audio/', new_filename)
+                    os.rename(temp_path, final_path)
+                    try:
+                        conn = get_db_connection()
+                        cursor = conn.cursor()                            
+                        cursor.execute("INSERT INTO audio_files (filename, q_id, participant_id) VALUES (%s, %s, %s)", (new_filename, key, participant_id))
+                        conn.commit()
+                        cursor.close()
+                        conn.close()
+                        response["success"] = True
+                    except Error as e:
+                        print("Error while connecting to MySQL", e)
+                        return 'Failed to submit data.'
 
-            # Save file metadata to the database
-            try:
-                conn = get_db_connection()
-                cursor = conn.cursor()    
-                
-                cursor.execute("INSERT INTO audio_files (filename, question_id, participant_id) VALUES (%s, %s, %s)", (filename, question_id, user_id))
-                mysql.connection.commit()
-                conn.commit()
-                cursor.close()
-                conn.close()
-            except Error as e:
-                print("Error while connecting to MySQL", e)
-                return 'Failed to submit data.'
-                
-        else:
-            return jsonify({"error": "Tipo de archivo inválido"}), 400
-    return redirect(url_for('open_questions'))
+                else:
+                    os.remove(temp_path)  # Remove temp file if not allowed
+                    response["error"] = "Invalid file type"
+                    break
+            else:
+                response["error"] = "Invalid file extension or no file found"
+                break
+    except Exception as e:
+        response["error"] = str(e)
+
+    return jsonify(response)
+
+@app.route('/gracias', methods=['POST'])
+def gracias():
+    return render_template('gracias.html')
