@@ -7,9 +7,11 @@ from mysql.connector import Error
 #DB = Sequel.connect('mysql2://digital_user:goU0oLgYwsc4JXiA@localhost/digital')
 
 db_config = {
-    'host': 'mysql2://localhost/digital',
+    #'host': 'mysql2://localhost/digital',
+    'host': '127.0.0.1',
     'user': 'digital_user',
     'password': 'goU0oLgYwsc4JXiA',
+    #'password': 'goU0oLgYwsc4JXiA_',
     'database': 'canna_emar'
 }
 
@@ -19,17 +21,22 @@ def create_tables():
         # Establishing a connection to the database
         conn = mysql.connector.connect(**db_config)
         if conn.is_connected():
+            print("Connected to the database")
+
             cursor = conn.cursor()
             cursor.execute(''' CREATE TABLE IF NOT EXISTS audio_files (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         filename VARCHAR(100),
                         question_id INT,
-                        user_id INT,
+                        participant_id VARCHAR(255),
                         upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ''')
+
+            #print("Table [table_name] created successfully")
 
 
             cursor.execute(''' CREATE TABLE sociodemographic_data (
                                 id INT AUTO_INCREMENT PRIMARY KEY,
+                                participant_id VARCHAR(100),
                                 name VARCHAR(255),
                                 age INT,
                                 sex VARCHAR(50),
@@ -38,53 +45,59 @@ def create_tables():
                                 years_in_uruguay INT,
                                 residence VARCHAR(100),
                                 email VARCHAR(255),
-                                phone VARCHAR(100)''')
+                                phone VARCHAR(100),
+                                date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
 
             # Create table for cannabis questionnaire responses
             cursor.execute(''' CREATE TABLE IF NOT EXISTS cannabis_questionnaire_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id INT,
+                    participant_id VARCHAR(255),
                     question_1_response VARCHAR(255),
                     question_2_response VARCHAR(255),
                     question_3_response VARCHAR(255),
-                    -- Add more fields as per your questionnaire
-                    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+                    question_4_response VARCHAR(255),
+                    question_5_response VARCHAR(255),
+                    question_6_response VARCHAR(255),
+                    question_7_response VARCHAR(255),
+                    question_8_response VARCHAR(255),
+                    question_9_response VARCHAR(255),
+                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
 
+
+            nQuest = 36
+            q_strings = ["question_" + str(i) + "_response VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ",\n".join(q_strings)
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS traumatic_experiences_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id INT,
-                    question_1_response INT,
-                    question_2_response INT,
-                    question_3_response INT,
-                    -- Add more fields as per your questionnaire
-                    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+                    participant_id VARCHAR(255), ''' + q_strings + ''')''')
+
+
+            nQuest = 29
+            q_strings = ["question_" + str(i) + "_response VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ",\n".join(q_strings)
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS saliency_scale_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id INT,
-                    question_1_response VARCHAR(10),
-                    question_2_response VARCHAR(10),
-                    -- Add fields as per your questionnaire
-                    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+                    participant_id VARCHAR(255), ''' + q_strings + ''')''')
+
+
+            nQuest = 34
+            q_strings = ["question_" + str(i) + "_response VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ",\n".join(q_strings)
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS self_reference_ideas_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id INT,
-                    question_1_response VARCHAR(10),
-                    question_2_response VARCHAR(10),
-                    -- Add fields as per your questionnaire
-                    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+                    participant_id VARCHAR(255), ''' + q_strings + ''')''')
 
-            cursor.execute('''CREATE TABLE IF NOT EXISTS sns_questionnaire_responses (
+
+            nQuest = 20
+            q_strings = ["question_" + str(i) + "_response VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ",\n".join(q_strings)
+
+            cursor.execute(''' CREATE TABLE IF NOT EXISTS sns_questionnaire_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_id INT,
-                    question_1_response VARCHAR(10),
-                    question_2_response VARCHAR(10),
-                    -- Add fields as per your questionnaire
-                    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
-
-
+                    participant_id VARCHAR(255), ''' + q_strings + ''')''')
 
             conn.commit()
             cursor.close()
@@ -93,6 +106,10 @@ def create_tables():
             print("Failed to connect to the database")
     except Error as e:
         print(f"Error: {e}")
+        print("Algo no anduvo bien!")
     finally:
+        print("Algo no anduvo bien!")
         if conn.is_connected():
             conn.close()
+
+create_tables()
