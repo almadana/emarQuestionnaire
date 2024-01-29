@@ -46,7 +46,7 @@
             const recorder = new RecordRTC(stream, { type: 'audio', timeSlice: 180000 });
             recorders[questionNumber] = recorder;
             recorder.startRecording();
-            
+            audios[questionNumber-1]=false;
             //document.getElementById('recordButton' + questionNumber).disabled = true;
             //document.getElementsByClassName("recordButton").disabled=true; // disable all recording buttons
             const collection = document.getElementsByClassName("recordButton");
