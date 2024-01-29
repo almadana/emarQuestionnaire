@@ -17,21 +17,21 @@
 
         <!-- Question 1 -->
     <p>1. Relata con el mayor detalle posible cómo es para ti un día común y corriente.</p>
-    <button id="recordButton1" onclick="startRecording(1)">Grabar Respuesta</button>
-    <button id="stopButton1" onclick="stopRecording(1)" disabled>Detener Grabación</button>
-    <input type="file" accept="audio/*" id="audioUpload1" style="display:none;">
+    <button id="recordButton1" onclick="startRecording(1)" class="recordButton">Grabar Respuesta</button>
+    <button id="stopButton1" onclick="stopRecording(1)" class="stopButton" disabled>Detener Grabación</button>
+    <input type="file" accept="audio/*" id="audioUpload1" style="display:none;"><div id="tick1" style="visibility:hidden"><img src="static/img/tick.png" style="width:30px;height:30px"></div>
     <br>
 
     <!-- Question 3 -->
     <p>3. Relata cómo le explicarías a una persona sorda qué es escuchar</p>
-    <button id="recordButton2" onclick="startRecording(2)">Grabar Respuesta</button>
-    <button id="stopButton2" onclick="stopRecording(2)" disabled>Detener Grabación</button>
+    <button id="recordButton2" onclick="startRecording(2)" class="recordButton">Grabar Respuesta</button>
+    <button id="stopButton2" onclick="stopRecording(2)" class="stopButton" disabled>Detener Grabación</button>
     <br>
-    <input type="file" accept="audio/*" id="audioUpload3" style="display:none;">
+    <input type="file" accept="audio/*" id="audioUpload3" style="display:none;"><div id="tick2" style="visibility:hidden"><img src="static/img/tick.png" style="width:30px;height:30px"></div>
     
 </p>
 
-    <button onclick="submitAnswers()">Enviar Respuestas</button>
+    <button onclick="submitAnswers()" disabled id="enviar">Enviar Respuestas</button>
 
 </p> 
 
@@ -41,22 +41,28 @@
 <script>
     let recorders = {};
     let audioBlobs = {};
-
     function startRecording(questionNumber) {
         navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
             const recorder = new RecordRTC(stream, { type: 'audio', timeSlice: 180000 });
             recorders[questionNumber] = recorder;
             recorder.startRecording();
             
-            document.getElementById('recordButton' + questionNumber).disabled = true;
+            //document.getElementById('recordButton' + questionNumber).disabled = true;
+            //document.getElementsByClassName("recordButton").disabled=true; // disable all recording buttons
+            const collection = document.getElementsByClassName("recordButton");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].disabled = true;
+            }
             document.getElementById('stopButton' + questionNumber).disabled = false;
+            document.getElementById('enviar').disabled = true;
+            document.getElementById('tick' + questionNumber).style.visibility = 'hidden';
 
             // Automatically stop recording after 3 minutes
             setTimeout(() => {
                 stopRecording(questionNumber);
             }, 180000);
         }).catch(e => {
-            console.error('Could not start recording: ', e);
+            console.error('Error al comenzar la grabación: ', e);
         });
     }
 
@@ -68,8 +74,17 @@
                 audioBlobs[questionNumber] = blob;
                 
                 // Reset buttons
-                document.getElementById('recordButton' + questionNumber).disabled = false;
+                //document.getElementsByClassName("recordButton").disabled = false; // disable all recording buttons
+                const collection = document.getElementsByClassName("recordButton");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].disabled = false;
+                }
                 document.getElementById('stopButton' + questionNumber).disabled = true;
+                document.getElementById('tick' + questionNumber).style.visibility = 'visible';
+                audios[questionNumber-1]=true;
+                if (audios[0] && audios[1]) {
+                    document.getElementById('enviar').disabled = false;
+                }
             });
         }
     }
@@ -110,6 +125,7 @@
     });
 }
 
+let audios = [false,false];
 
 </script>
 

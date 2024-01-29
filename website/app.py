@@ -364,6 +364,6 @@ def upload_audio():
 
     return jsonify(response)
 
-@app.route('/gracias', methods=['POST'])
+@app.route('/gracias', methods=['GET'])
 def gracias():
     return render_template('gracias.html')
