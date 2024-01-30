@@ -10,6 +10,7 @@
     <link rel="canonical" href="http://digital.psico.edu.uy/cannabis">
 </head>
 <body lang="es-UY" dir="ltr"><h1>Consentimiento Informado</h1>
+<main>
 <p>Acepto participar en la investigación Síntomas prodrómicos de
 psicosis: Ideas de autorreferencia y características discursivas en
 consumidores de cannabis como variables para la detección temprana
@@ -68,12 +69,27 @@ participar”, y escribe tu nombre y fecha. En caso de abandonar,
 puedes cerrar esta página.</p>
 <center>
 <form action="/submit-consent" method="post">
-	<p><a name="consentCheckbox"></a><input type="checkbox" name="consent" value="agree"  style="width: 0.28cm; height: 0.28cm">
+	<p><input type="checkbox" name="consent" value="agree" id="consent" style="width: 0.28cm; height: 0.28cm">
 	Acepto los términos y condiciones del estudio<br/>
 <br/>
-<input type="submit" value="Enviar"  style="width: 1.72cm; height: 0.95cm">
+<input type="submit" value="Enviar" id="enviar" disabled style="width: 1.72cm; height: 0.95cm">
 		</p>
 </form>
 </center>
+<main>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+	document.getElementById("consent").addEventListener('change', function() {
+		if (this.checked) {
+			document.getElementById("enviar").disabled = false;
+		}
+		else {
+			document.getElementById("enviar").disabled = true;
+		}
+	})
+});
+</script>
+
 </body>
 </html>
