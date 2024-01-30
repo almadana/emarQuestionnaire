@@ -19,7 +19,6 @@ def generate_random_string(length=8):
 
 
 db_config = {
-    #'host': 'mysql2://localhost/digital',
     'host': '127.0.0.1',
     'user': 'digital_user',
     'password': 'goU0oLgYwsc4JXiA',
