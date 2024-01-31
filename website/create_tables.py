@@ -17,6 +17,7 @@ db_config = {
 
 
 def create_tables():
+    conn = None
     try:
         # Establishing a connection to the database
         conn = mysql.connector.connect(**db_config)
@@ -92,7 +93,7 @@ def create_tables():
 
 
             nQuest = 20
-            q_strings = ["q_" + str(i) + " VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ["q_" + str(i) + " VARCHAR(255)" for i in range(1,nQuest+1)]
             q_strings = ",\n".join(q_strings)
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS sns_questionnaire_responses (
@@ -108,7 +109,7 @@ def create_tables():
         print(f"Error: {e}")
     finally:
         print("Algo no anduvo bien!")
-        if conn.is_connected():
+        if conn and conn.is_connected():
             conn.close()
 
 create_tables()
