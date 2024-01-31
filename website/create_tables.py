@@ -106,7 +106,6 @@ def create_tables():
             print("Failed to connect to the database")
     except Error as e:
         print(f"Error: {e}")
-        print("Algo no anduvo bien!")
     finally:
         print("Algo no anduvo bien!")
         if conn.is_connected():
