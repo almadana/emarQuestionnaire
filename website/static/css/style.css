@@ -1,3 +1,8 @@
+#timer {
+  font-size: 20px;
+  font-weight: bold;
+}
+
 .copylink-button {
   padding: 10px 15px;
   font-size: 16px;
@@ -220,14 +225,36 @@ body {
   font: 1rem "comfortaa", sans-serif;
 }
 
+html {
+  font-size: 16px; /* Default font size */
+}
+
+/* Responsive font size adjustment */
+@media (max-width: 768px) {
+  html {
+    font-size: 12px; /* Reduce the base font size on smaller screens */
+  }
+}
+
+
+
 h1 {
-  font-size: 4rem;
+  font-size: 3rem;
   color: hsl(186, 100%, 33%);
   text-align: center;
 }
 
+h2 {
+  font-size: 2rem;
+  color: hsl(186, 100%, 33%);
+  text-align: center;
+}
+
+
 .logos  {
   text-align: center;
+  width: 80vw; /* Adjust based on your design needs */
+  max-width: 750px;
 }
 
 main {
@@ -414,6 +441,10 @@ form table tbody td {
 }
 
 @media (min-width: 1024px) {
+  .logo {
+    width: 100vw; /* Increase size on smaller screens */
+    min-width: 100px; /* Example minimum size */
+  }
   .excercise .question_wrap_header {
     display: none;
   }

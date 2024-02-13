@@ -11,15 +11,16 @@
 
 </head>
 <body>
-    <h1>Preguntas Abiertas</h1>
+    <h2>Preguntas Abiertas (7/7)</h2>
     <main>
-    <p>A continuación, se te presentan 3 preguntas abiertas. Estando tranquilo/a y ubicado/a en un lugar cómodo, responde libremente a cada una de ellas grabando y enviando una nota de voz desde tu celular.</p>
+    <p>A continuación, se te presentan 2 preguntas abiertas. Estando tranquilo/a y ubicado/a en un lugar cómodo, responde libremente a cada una de ellas grabando una nota de voz. Para poder grabar el audio, debes autorizar a que tu navegador utilice el micrófono de tu dispositivo (si no lo has hecho antes).</p>
 
         <!-- Question 1 -->
     <p>1. Relata con el mayor detalle posible cómo es para ti un día común y corriente.</p>
     <button id="recordButton1" onclick="startRecording(1)" class="recordButton">Grabar Respuesta</button>
     <button id="stopButton1" onclick="stopRecording(1)" class="stopButton" disabled>Detener Grabación</button>
     <input type="file" accept="audio/*" id="audioUpload1" style="display:none;"><div id="tick1" style="visibility:hidden"><img src="static/img/tick.png" style="width:30px;height:30px"></div>
+    <div id="timer1">03:00</div>
     <br>
 
     <!-- Question 3 -->
@@ -28,6 +29,7 @@
     <button id="stopButton2" onclick="stopRecording(2)" class="stopButton" disabled>Detener Grabación</button>
     <br>
     <input type="file" accept="audio/*" id="audioUpload3" style="display:none;"><div id="tick2" style="visibility:hidden"><img src="static/img/tick.png" style="width:30px;height:30px"></div>
+    <div id="timer2">03:00</div>
     
 </p>
 
@@ -41,6 +43,28 @@
 <script>
     let recorders = {};
     let audioBlobs = {};
+    
+    var interval;
+    
+    function startTimer(duration, display) {
+        var timer = duration, minutes, seconds;
+        interval = setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+            clearInterval(interval);
+            display.textContent = "Se acabó el tiempo!";
+            // You can add any actions here to be executed after the countdown ends
+            }
+        }, 1000);
+    }
+    
     function startRecording(questionNumber) {
         navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
             const recorder = new RecordRTC(stream, { type: 'audio', timeSlice: 180000 });
@@ -56,11 +80,16 @@
             document.getElementById('stopButton' + questionNumber).disabled = false;
             document.getElementById('enviar').disabled = true;
             document.getElementById('tick' + questionNumber).style.visibility = 'hidden';
+            
+            var display = document.getElementById('timer' + questionNumber);
+            var duration = 180;
+            startTimer(duration, display);
+            
 
-            // Automatically stop recording after 3 minutes
+            //  Automatically stop recording after 3 minutes
             setTimeout(() => {
                 stopRecording(questionNumber);
-            }, 180000);
+            }, duration*100);
         }).catch(e => {
             console.error('Error al comenzar la grabación: ', e);
         });
@@ -81,6 +110,7 @@
                 }
                 document.getElementById('stopButton' + questionNumber).disabled = true;
                 document.getElementById('tick' + questionNumber).style.visibility = 'visible';
+                clearInterval(interval)
                 audios[questionNumber-1]=true;
                 if (audios[0] && audios[1]) {
                     document.getElementById('enviar').disabled = false;

@@ -10,9 +10,11 @@
     <link rel="canonical" href="http://digital.psico.edu.uy/cannabis">
 </head>
 <body>
-    <h1>Cuestionario sobre Consumo de Cannabis</h1>
+    <h2>Cuestionario sobre Consumo de Cannabis (3/7)</h2>
     <main>
     <form action="/submit-cq" method="post">
+    
+    <div id="pregunta1">
         <p>1. Pensando en el consumo de cannabis en su vida, ¿Con qué frecuencia ha consumido?</p>
         <input type="radio" id="q1_7" name="q1" value="0" required>
         <label for="q1_7">Nunca</label><br>
@@ -34,11 +36,19 @@
         <label for="q1_15">3-4 veces por semana</label><br>
         <input type="radio" id="q1_16" name="q1" value="9">
         <label for="q1_16">Todos los días</label><br>
+        
+        </div>
 <br>        
 
-<p>2. ¿A qué edad comenzó a consumir cannabis?</p>
-<input type="number" name="q2"><br><br>
 
+<div class="preguntas">
+
+<p>2. ¿A qué edad comenzó a consumir cannabis?</p>
+<input type="number" required name="q2"><br><br>
+
+</div>
+
+<div class="preguntas">
 <p>3. La forma en que lo consume es: 
 	</p>
 	<p>
@@ -51,6 +61,9 @@
 <input type="radio" name="q3" value="otra"  style="width: 0.28cm; height: 0.28cm">
 	Otra</p><br>        
 
+</div>
+	
+<div class="preguntas">
 <p>4. ¿De dónde obtiene el cannabis?</p>
 	<p>
 	<input type="radio" required name="q4" value="autocultivo"  style="width: 0.28cm; height: 0.28cm">
@@ -61,7 +74,10 @@
 	Farmacia<br/>
 <input type="radio" name="q4" value="otros"  style="width: 0.28cm; height: 0.28cm">
 	Otros</p>
-<br>        
+<br>        </div>
+
+
+<div class="preguntas">
 
 <p>5. ¿Cuánto tiempo pasó desde que consumió por última vez?</p>
 	<p><a name="q5_7"></a><a name="q5_8"></a><a name="q5_9"></a><a name="q5_10"></a><a name="q5_11"></a><a name="q5_12"></a><a name="q5_13"></a><a name="q5_14"></a>
@@ -79,6 +95,9 @@
 	1 mes<br/>
 <input type="radio" name="q5" value="6"  style="width: 0.28cm; height: 0.28cm">
 	2 meses o más</p>
+</div>
+
+<div class="preguntas">
 
 
             <p>6. Considerando las siguientes fotos:</p>
@@ -105,8 +124,10 @@
 	14 grs<br/>
 <input type="radio" name="q6" value="8"  style="width: 0.28cm; height: 0.28cm">
 	28 grs</p>
+</div>
 
 
+<div class="preguntas">
 <br>        <p>7. ¿Cuál cree que es el porcentaje de THC del cannabis que consume? </p>
         
 
@@ -124,8 +145,10 @@
 <input type="radio" name="q7" value="nsnc"  style="width: 0.28cm; height: 0.28cm">
 	No sabe no contesta</p>
 
+</div>
 
 
+<div class="preguntas">
 <p>8. ¿Qué tan riesgos cree que sea el consumo ocasional de
 	cannabis?</p>
 
@@ -140,8 +163,10 @@
 	Algo riesgoso<br/>
 <input type="radio" name="q8" value="5"  style="width: 0.28cm; height: 0.28cm">
 	Muy riesgoso</p>
+</div>
 
 
+<div class="preguntas">
 <p>9. ¿Qué tan riesgos cree que sea el consumo frecuente de
 	cannabis?</p>
 	
@@ -156,7 +181,8 @@
 	Algo riesgoso<br/>
 <input type="radio" name="q9" value="5"  style="width: 0.28cm; height: 0.28cm">
 	Muy riesgoso<br/>
-
+	
+</div>
 
 
 <br>        <input type="submit" value="Enviar">
@@ -165,6 +191,24 @@
     </main>
 
 <script>
+	document.getElementById('pregunta1').addEventListener('change', function(e) {
+		if (e.target.value == "0"){ // participant declares he never consumed cannabis
+			const divs = document.querySelectorAll('.preguntas');
+			divs.forEach(div => {
+				div.style.display = 'none'; //hide other questions
+				div.querySelector('input').required = false
+			});
+		}
+		else {
+			const divs = document.querySelectorAll('.preguntas');
+			divs.forEach(div => {
+				div.style.display = 'block'; //hide other questions
+				div.querySelector('input').required = true
+			});
+		}
+	});
+
+
 	function checkOrientation() {
 		let horizontal = document.getElementById('porro-horizontal');
 		let vertical = document.getElementById('porro-vertical');
