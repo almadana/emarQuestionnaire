@@ -366,3 +366,10 @@ def upload_audio():
 @app.route('/gracias', methods=['GET'])
 def gracias():
     return render_template('gracias.html')
+
+
+
+@app.route('/og_image.png', methods=['GET'])
+def og_image():
+    return send_file('static/img/og_image.png')   
+

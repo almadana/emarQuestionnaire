@@ -255,6 +255,7 @@ h2 {
   text-align: center;
   width: 80vw; /* Adjust based on your design needs */
   max-width: 750px;
+  margin: auto;
 }
 
 main {
@@ -438,19 +439,4 @@ form table tbody td {
 
 .question-title {
   color: hsl(186, 100%, 33%);
-}
-
-@media (min-width: 1024px) {
-  .logo {
-    width: 100vw; /* Increase size on smaller screens */
-    min-width: 100px; /* Example minimum size */
-  }
-  .excercise .question_wrap_header {
-    display: none;
-  }
-
-  .excercise.short_question .question_wrap .question_wrap_main,
-  .excercise.long_question .question_wrap .question_wrap_main {
-    display: flex;
-  }
 }
