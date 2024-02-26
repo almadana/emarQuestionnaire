@@ -13,29 +13,40 @@
 <body>
     <h2>Preguntas Abiertas (7/7)</h2>
     <main>
-    <p>A continuación, se te presentan 2 preguntas abiertas. Estando tranquilo/a y ubicado/a en un lugar cómodo, responde libremente a cada una de ellas grabando una nota de voz. Para poder grabar el audio, debes autorizar a que tu navegador utilice el micrófono de tu dispositivo (si no lo has hecho antes).</p>
+    <p>A continuación, se te presentan 3 preguntas abiertas. Estando tranquilo/a y ubicado/a en un lugar cómodo, responde libremente a cada una de ellas grabando una nota de voz de 3 minutos como máximo. Para poder grabar el audio, debes autorizar a que tu navegador utilice el micrófono de tu dispositivo (si no lo has hecho antes).</p>
 
         <!-- Question 1 -->
-    <p>1. Relata con el mayor detalle posible cómo es para ti un día común y corriente.</p>
+    <p>1. Contanos con el mayor detalle posible en un máximo de 3 minutos, ¿cómo es para vos un día común en tu semana?</p>
     <button id="recordButton1" onclick="startRecording(1)" class="recordButton">Grabar Respuesta</button>
     <button id="stopButton1" onclick="stopRecording(1)" class="stopButton" disabled>Detener Grabación</button>
     <input type="file" accept="audio/*" id="audioUpload1" style="display:none;"><div id="tick1" style="visibility:hidden"><img src="static/img/tick.png" style="width:30px;height:30px"></div>
     <div id="timer1">03:00</div>
     <br>
 
-    <!-- Question 3 -->
-    <p>3. Relata cómo le explicarías a una persona sorda qué es escuchar</p>
+    <!-- Question 2 -->
+    <p>2. Relata, en un máximo de 3 minutos, algún sueño que hayas tenido.</p>
     <button id="recordButton2" onclick="startRecording(2)" class="recordButton">Grabar Respuesta</button>
     <button id="stopButton2" onclick="stopRecording(2)" class="stopButton" disabled>Detener Grabación</button>
     <br>
-    <input type="file" accept="audio/*" id="audioUpload3" style="display:none;"><div id="tick2" style="visibility:hidden"><img src="static/img/tick.png" style="width:30px;height:30px"></div>
+    <input type="file" accept="audio/*" id="audioUpload2" style="display:none;"><div id="tick2" style="visibility:hidden"><img src="static/img/tick.png" style="width:30px;height:30px"></div>
     <div id="timer2">03:00</div>
+
+        <!-- Question 3 -->
+    <p>3. Respecto a la imagen que ves debajo: describe brevemente en un máximo de 3 minutos, qué está sucediendo, qué sienten los personajes y cuál será el desenlace.</p>
+    <button id="recordButton3" onclick="startRecording(3)" class="recordButton">Grabar Respuesta</button>
+    <button id="stopButton3" onclick="stopRecording(3)" class="stopButton" disabled>Detener Grabación</button>
+    <br>
+    <button id="boton_imagen" onclick="mostrar_imagen()">Mostrar imagen</button>
     
-</p>
+    <input type="file" accept="audio/*" id="audioUpload3" style="display:none;"><div id="tick3" style="visibility:hidden"><img src="static/img/tick.png" style="width:30px;height:30px"></div>
+    <div id="imagen_test" style="visibility:hidden"><img src="static/img/test.png"></div>
+    
+    <div id="timer3">03:00</div>
+
+
+
 
     <button onclick="submitAnswers()" disabled id="enviar">Enviar Respuestas</button>
-
-</p> 
 
  
     
@@ -45,6 +56,18 @@
     let audioBlobs = {};
     
     var interval;
+    
+    function mostrar_imagen() {
+        boton = document.getElementById('boton_imagen')
+        if ( boton.innerText == "Mostrar imagen") {
+            document.getElementById('imagen_test').style.visibility = 'visible';
+            boton.innerText = "Ocultar imagen";
+        }
+        else {
+            document.getElementById('imagen_test').style.visibility = 'hidden';
+            boton.innerText = "Mostrar imagen";
+        }
+    }
     
     function startTimer(duration, display) {
         var timer = duration, minutes, seconds;
