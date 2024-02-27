@@ -2,3 +2,5 @@
 data/*
 *.pyc
 __psycache__/*
+db_credentials.txt
+app_key.txt
