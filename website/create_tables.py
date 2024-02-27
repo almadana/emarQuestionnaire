@@ -6,14 +6,20 @@ from mysql.connector import Error
 
 #DB = Sequel.connect('mysql2://digital_user:goU0oLgYwsc4JXiA@localhost/digital')
 
+#open mysql server credentials file
+with open('db_credentials.txt', 'r') as file:
+    lines = file.readlines()
+    db_user = lines[0].strip()
+    db_pass = lines[1].strip()
+
 db_config = {
-    #'host': 'mysql2://localhost/digital',
     'host': '127.0.0.1',
-    'user': 'digital_user',
-    'password': 'goU0oLgYwsc4JXiA',
+    'user': db_user,
+    'password': db_pass,
     #'password': 'goU0oLgYwsc4JXiA_',
     'database': 'canna_emar'
 }
+
 
 
 def create_tables():
