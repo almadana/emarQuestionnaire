@@ -7,8 +7,12 @@ from werkzeug.utils import secure_filename
 #logging.basicConfig(filename='app.log', level=logging.DEBUG)
 
 
+with open('app_key.txt', 'r') as file:
+    lines = file.readlines()
+    app_key = lines[0].strip()
+
 app = Flask(__name__)
-app.secret_key = "ba{-\x1e\x9b!\x07_[\xd9\xa8\x15\x1b$\xb6<"  # Set your secret key here
+app.secret_key = app_key  # Set your secret key here
 
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3'}
@@ -18,10 +22,18 @@ def generate_random_string(length=8):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
 
 
+#open mysql server credentials file
+with open('db_credentials.txt', 'r') as file:
+    lines = file.readlines()
+    db_user = lines[0].strip()
+    db_pass = lines[1].strip()
+
+
+
 db_config = {
     'host': '127.0.0.1',
-    'user': 'digital_user',
-    'password': 'goU0oLgYwsc4JXiA',
+    'user': db_user,
+    'password': db_pass,
     #'password': 'goU0oLgYwsc4JXiA_',
     'database': 'canna_emar'
 }
