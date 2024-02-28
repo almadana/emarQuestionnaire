@@ -101,6 +101,8 @@ def submit_sociodemo():
         education_level = request.form['education']
         country_of_origin = request.form['country']
         years_in_uruguay = request.form['years_in_uruguay']
+        if years_in_uruguay == '':
+            years_in_uruguay = -1
         residence = request.form['residence']
         email = request.form['email']
         phone = request.form['phone']
