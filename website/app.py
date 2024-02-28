@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, send_file
 import random, logging, datetime, magic, os, string
 import mysql.connector
 from mysql.connector import Error
@@ -7,7 +7,15 @@ from werkzeug.utils import secure_filename
 #logging.basicConfig(filename='app.log', level=logging.DEBUG)
 
 
-with open('app_key.txt', 'r') as file:
+# Current file's directory
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+def get_path(filename):
+    return os.path.join(basedir, filename)
+
+
+with open(get_path("app_key.txt"), 'r') as file:
     lines = file.readlines()
     app_key = lines[0].strip()
 
@@ -22,8 +30,8 @@ def generate_random_string(length=8):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
 
 
-#open mysql server credentials file
-with open('db_credentials.txt', 'r') as file:
+# open mysql server credentials file
+with open(get_path('db_credentials.txt'), 'r') as file:
     lines = file.readlines()
     db_user = lines[0].strip()
     db_pass = lines[1].strip()
@@ -346,10 +354,10 @@ def upload_audio():
             if audio_file:
                 file_extension = audio_file.filename.rsplit('.', 1)[1].lower()
                 new_filename = f"{participant_id}_{key}.{file_extension}"
-                temp_path = os.path.join('temp/', new_filename)
+                temp_path = os.path.join(get_path('temp/'), new_filename)
                 audio_file.save(temp_path)  # Temporarily save file
                 if allowed_file(temp_path):  # Check MIME type
-                    final_path = os.path.join('data/audio/', new_filename)
+                    final_path = os.path.join(get_path('data/audio/'), new_filename)
                     os.rename(temp_path, final_path)
                     try:
                         conn = get_db_connection()
