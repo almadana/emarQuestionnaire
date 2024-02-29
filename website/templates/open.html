@@ -57,6 +57,17 @@
     
     var interval;
     
+    const options = {
+        type: 'audio',
+        mimeType: 'audio/webm;codecs=opus', // Using Opus codec for better compression
+        bitsPerSecond: 64000, // Lower bit rate to reduce file size
+        sampleRate: 24000, // Lower sample rate for voice recordings
+        numberOfAudioChannels: 1, // Mono recording
+        timeSlice: 180000, // Duration of recording in milliseconds
+    };
+    
+    
+    
     function mostrar_imagen() {
         boton = document.getElementById('boton_imagen')
         if ( boton.innerText == "Mostrar imagen") {
@@ -90,7 +101,7 @@
     
     function startRecording(questionNumber) {
         navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-            const recorder = new RecordRTC(stream, { type: 'audio', timeSlice: 180000 });
+            const recorder = new RecordRTC(stream, options);
             recorders[questionNumber] = recorder;
             recorder.startRecording();
             audios[questionNumber-1]=false;
@@ -112,7 +123,7 @@
             //  Automatically stop recording after 3 minutes
             setTimeout(() => {
                 stopRecording(questionNumber);
-            }, duration*100);
+            }, duration*1000);
         }).catch(e => {
             console.error('Error al comenzar la grabación: ', e);
         });
