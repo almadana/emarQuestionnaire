@@ -20,17 +20,23 @@
         <input type="number" id="age" name="age" required><br><br>
 
         <label for="sex">Sexo:</label><br>
-        <input type="radio" id="male" name="sex" value="Varón" required>
+        <input type="radio" id="male" name="sex" value="Varón" required onchange="genderCheck()">
         <label for="male">Varón</label><br>
-        <input type="radio" id="female" name="sex" value="Mujer">
+        <input type="radio" id="female" name="sex" value="Mujer" onchange="genderCheck()">
         <label for="female">Mujer</label><br>
-        <input type="radio" id="no_say" name="sex" value="Prefiero no decirlo">
+        <input type="radio" id="no_say" name="sex" value="Prefiero no decirlo" onchange="genderCheck()">
         <label for="no_say">Prefiero no decirlo</label><br>
-        <input type="radio" id="self_describe" name="sex" value="Prefiero autodescribirme">
-        <label for="self_describe">Prefiero autodescribirme</label><br><br>
+        <input type="radio" id="self_describe" name="sex" value="Prefiero autodescribirme" onchange="genderCheck()">
+        <label for="self_describe">Prefiero autodescribirme</label>
+        <div id="div-prefiero" style="display: none;">
+            <input type="text" id="prefiero-text" name="prefiero-text">
+        </div>
+        
+        <br><br>
 
         <label for="education">Nivel educativo:</label><br>
         <select name="education" id="education" required>
+            <option value="" selected disabled>Elige una opción</option>
             <option value="Primaria incompleta">Primaria incompleta</option>
             <option value="Primaria completa">Primaria completa</option>
             <option value="Secundaria incompleta">Secundaria incompleta</option>
@@ -41,6 +47,7 @@
 
         <label for="country">País de origen:</label><br>
         <select name="country" id="country" required>
+            <option value="" selected disabled>Elige una opción</option>
             <option value="UY">Uruguay</option>
             <option value="AR">Argentina</option>
             <option value="BR">Brasil</option>
@@ -56,6 +63,7 @@
 
         <label for="residence">Departamento de residencia:</label><br>
         <select id="residence" name="residence" required>
+            <option value="" selected disabled>Elige una opción</option>
             <option value="No resido en Uruguay">
             <option value="Artigas">Artigas</option>
             <option value="Canelones">Canelones</option>
@@ -89,5 +97,20 @@
         <input type="submit" value="Enviar">
     </form>
     </main>
+
+    <script>
+    function genderCheck() {
+        // Check if the specific radio button is selected
+        var sd = document.getElementById('self_describe');
+        var div_pref = document.getElementById('div-prefiero');
+
+        // Show or hide the text field based on the radio button selection
+        if (sd.checked) {
+            div_pref.style.display = 'block';
+        } else {
+            div_pref.style.display = 'none';
+        }
+    }
+</script>    
 </body>
 </html>
