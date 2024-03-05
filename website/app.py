@@ -23,7 +23,7 @@ app = Flask(__name__)
 app.secret_key = app_key  # Set your secret key here
 
 
-ALLOWED_EXTENSIONS = {'wav', 'mp3'}
+ALLOWED_EXTENSIONS = {'wav', 'mp3','webm','ogg','m4a'}
 
 def generate_random_string(length=8):
     # Generates a random string of a given length
@@ -335,7 +335,8 @@ def open():
 def allowed_file(filename):
     """Check if the file has one of the allowed extensions and MIME types."""
     allowed_extension = '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-    allowed_mime = magic.from_file(filename, mime=True) in ['audio/wav', 'video/webm']
+    allowed_mime = magic.from_file(filename, mime=True) in ['audio/wav', 'video/webm', 'audio/mp4', 'audio/webm']
+
 
     print(allowed_extension)
     print(allowed_mime)
