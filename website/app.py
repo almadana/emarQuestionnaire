@@ -106,13 +106,15 @@ def submit_sociodemo():
         residence = request.form['residence']
         email = request.form['email']
         phone = request.form['phone']
+        ejer_sino = request.form['ejerSN']
+        ejer_freq = request.form['ejercicio-freq']
 
         # Insert data into the database
         sql = """INSERT INTO sociodemographic_data
                     (participant_id, name, age, sex, education_level, country_of_origin,
-                    years_in_uruguay, residence, email, phone)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-        cursor.execute(sql, (participant_id, name, age, sex, education_level, country_of_origin, years_in_uruguay, residence, email, phone))
+                    years_in_uruguay, residence, ejer_sino, ejer_freq, email, phone)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        cursor.execute(sql, (participant_id, name, age, sex, education_level, country_of_origin, years_in_uruguay, residence, ejer_sino, ejer_freq, email, phone))
         conn.commit()
         cursor.close()
         conn.close()

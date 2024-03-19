@@ -10,7 +10,7 @@ from mysql.connector import Error
 with open('db_credentials.txt', 'r') as file:
     lines = file.readlines()
     db_user = lines[0].strip()
-    db_pass = lines[1].strip()
+    db_pass = lines[1].strip()  
 
 db_config = {
     'host': '127.0.0.1',
@@ -53,6 +53,8 @@ def create_tables():
                                 residence VARCHAR(100),
                                 email VARCHAR(255),
                                 phone VARCHAR(100),
+                                ejer_sino VARCHAR(50),
+                                ejer_freq VARCHAR(50),
                                 date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
 
             # Create table for cannabis questionnaire responses
