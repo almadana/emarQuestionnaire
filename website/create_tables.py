@@ -38,7 +38,7 @@ def create_tables():
                         participant_id VARCHAR(255),
                         upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ''')
 
-            #print("Table [table_name] created successfully")
+            print("Table  created successfully")
 
 
             cursor.execute(''' CREATE TABLE sociodemographic_data (
@@ -57,20 +57,17 @@ def create_tables():
                                 ejer_freq VARCHAR(50),
                                 date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
 
+
+            nQuest = 20
+            q_strings = ["q_" + str(i) + " VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ",\n".join(q_strings)
+
+
             # Create table for cannabis questionnaire responses
             cursor.execute(''' CREATE TABLE IF NOT EXISTS cannabis_questionnaire_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    participant_id VARCHAR(255),
-                    q_1 VARCHAR(255),
-                    q_2 VARCHAR(255),
-                    q_3 VARCHAR(255),
-                    q_4 VARCHAR(255),
-                    q_5 VARCHAR(255),
-                    q_6 VARCHAR(255),
-                    q_7 VARCHAR(255),
-                    q_8 VARCHAR(255),
-                    q_9 VARCHAR(255),
-                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    participant_id VARCHAR(255), ''' + q_strings + ''')''')
 
 
             nQuest = 36
@@ -79,6 +76,7 @@ def create_tables():
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS traumatic_experiences_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
+                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     participant_id VARCHAR(255), ''' + q_strings + ''')''')
 
 
@@ -88,6 +86,7 @@ def create_tables():
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS saliency_scale_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
+                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     participant_id VARCHAR(255), ''' + q_strings + ''')''')
 
 
@@ -97,6 +96,7 @@ def create_tables():
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS self_reference_ideas_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
+                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     participant_id VARCHAR(255), ''' + q_strings + ''')''')
 
 
@@ -106,6 +106,7 @@ def create_tables():
 
             cursor.execute(''' CREATE TABLE IF NOT EXISTS sns_questionnaire_responses (
                     id INT AUTO_INCREMENT PRIMARY KEY,
+                    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     participant_id VARCHAR(255), ''' + q_strings + ''')''')
 
             conn.commit()

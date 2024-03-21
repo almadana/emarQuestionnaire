@@ -174,7 +174,7 @@ def submit_cq():
 
         # Extracting form data
 
-        nQuest = 9
+        nQuest = 20
         q_responses = [request.form.get("q"+str(i)) for i in range(1,nQuest+1)]
         q_responses.insert(0,participant_id)
 

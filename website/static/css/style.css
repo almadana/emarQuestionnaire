@@ -1,3 +1,9 @@
+.radio-small {
+  width: 0.28cm;
+  height: 0.28cm;
+}
+
+
 #timer {
   font-size: 20px;
   font-weight: bold;
