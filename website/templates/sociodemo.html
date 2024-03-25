@@ -14,10 +14,10 @@
     <main>
     <form action="/submit-sociodemo" method="post">
 
-        <label for="age">Edad:</label><br>
+        <label for="age" class="info-q">Edad:</label><br>
         <input type="number" id="age" name="age" required><br><br>
 
-        <label for="sex">Sexo:</label><br>
+        <label for="sex" class="info-q">Sexo:</label><br>
         <input type="radio" id="male" name="sex" value="Varón" required onchange="genderCheck()">
         <label for="male">Varón</label><br>
         <input type="radio" id="female" name="sex" value="Mujer" onchange="genderCheck()">
@@ -32,7 +32,7 @@
         
         <br><br>
 
-        <label for="education">Nivel educativo:</label><br>
+        <label for="education" class="info-q">Nivel educativo:</label><br>
         <select name="education" id="education" required>
             <option value="" selected disabled>Elige una opción</option>
             <option value="Primaria incompleta">Primaria incompleta</option>
@@ -43,7 +43,7 @@
             <option value="Terciaria completa">Terciaria completa</option>
         </select><br><br>
 
-        <label for="country">País de origen:</label><br>
+        <label for="country" class="info-q">País de origen:</label><br>
         <select name="country" id="country" required>
             <option value="" selected disabled>Elige una opción</option>
             <option value="UY">Uruguay</option>
@@ -56,10 +56,10 @@
             <option value="X">Otro</option>
         </select><br>
 
-        <label for="years_in_uruguay">Años en Uruguay (si aplica):</label><br>
+        <label for="years_in_uruguay" class="info-q">Años en Uruguay (si aplica):</label><br>
         <input type="number" id="years_in_uruguay" name="years_in_uruguay"><br><br>
 
-        <label for="residence">Departamento de residencia:</label><br>
+        <label for="residence" class="info-q">Departamento de residencia:</label><br>
         <select id="residence" name="residence" required>
             <option value="" selected disabled>Elige una opción</option>
             <option value="No resido en Uruguay">
@@ -83,17 +83,38 @@
             <option value="Tacuarembó">Tacuarembó</option>
             <option value="Treinta y Tres">Treinta y Tres</option>
         </select><br>
+        <br>
+        <label for="ejerSN" class="info-q">¿Realizas ejercicio físico?</label><br>
+        <input type="radio" id="ejerSI" name="ejerSN" value="Sí" required onchange="exerCheck()">
+        <label for="ejerSI">Sí</label><br>
+        <input type="radio" id="ejerNO" name="ejerSN" value="No" onchange="exerCheck()">
+        <label for="ejerNO">No</label><br>
+        <div id="div-ejercicio" style="display: none;">
+        <br><label class="info-q"> ¿Con qué frecuencia?</label><br>
+            <input type="radio" id="default-ejercicio" name="ejercicio-freq" value="NA" checked style="display:none;">
+            <input type="radio" id="1porsemana" name="ejercicio-freq" value="1_2">
+            <label for="1porsemana">1 o 2 veces por semana</label><br>
+            <input type="radio" id="2porsemana" name="ejercicio-freq" value="3_4">
+            <label for="2porsemana">3 o 4 veces por semana</label><br>
+            <input type="radio" id="3porsemana" name="ejercicio-freq" value="5mas">
+            <label for="3porsemana">5 o más veces por semana</label><br>
+
+        </div>
+        
+        
         
         <br>
         <p>La siguiente información será accesible sólo a los investigadores del equipo y tiene el fin de contactarte si fueses convocado/a la segunda etapa de la investigación:</p>
-        <label for="name">Nombre y apellido:</label><br>
+        <label for="name" class="info-q">Nombre y apellido:</label><br>
         <input type="text" id="name" name="name" required><br><br>
 
-        <label for="email">E-mail:</label><br>
+        <label for="email" class="info-q">E-mail:</label><br>
         <input type="email" id="email" name="email" required><br><br>
 
-        <label for="phone">Teléfono:</label><br>
+        <label for="phone" class="info-q">Teléfono:</label><br>
         <input type="tel" id="phone" name="phone" required><br><br>
+        
+        
 
         <input type="submit" value="Enviar">
     </form>
@@ -110,6 +131,20 @@
             div_pref.style.display = 'block';
         } else {
             div_pref.style.display = 'none';
+        }
+    }
+    function exerCheck() {
+        // Check if the specific radio button is selected
+        var sd = document.getElementById('ejerSI');
+        var div_pref = document.getElementById('div-ejercicio');
+
+        // Show or hide the text field based on the radio button selection
+        if (sd.checked) {
+            div_pref.style.display = 'block';
+            div_pref.querySelector('input').required = true;
+        } else {
+            div_pref.style.display = 'none';
+            div_pref.querySelector('input').required = false;
         }
     }
 </script>    
