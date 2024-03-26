@@ -377,7 +377,7 @@ def upload_audio():
                         return 'Failed to submit data.'
 
                 else:
-                    os.remove(temp_path)  # Remove temp file if not allowed
+                    #os.remove(temp_path)  # Remove temp file if not allowed
                     response["error"] = "Invalid file type"
                     break
             else:
