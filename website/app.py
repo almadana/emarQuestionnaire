@@ -337,7 +337,7 @@ def open():
 def allowed_file(filename):
     """Check if the file has one of the allowed extensions and MIME types."""
     allowed_extension = '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-    allowed_mime = magic.from_file(filename, mime=True) in ['audio/wav', 'video/webm', 'audio/mp4', 'audio/webm', 'audio/ogg', 'audio/vorbis', 'audio/opus']
+    allowed_mime = magic.from_file(filename, mime=True) in ['audio/wav', 'video/webm', 'audio/mp4', 'audio/webm', 'audio/ogg', 'audio/vorbis', 'audio/opus','video/mp4']
 
 
     print(allowed_extension)
