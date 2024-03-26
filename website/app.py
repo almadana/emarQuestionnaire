@@ -337,8 +337,7 @@ def open():
 def allowed_file(filename):
     """Check if the file has one of the allowed extensions and MIME types."""
     allowed_extension = '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-    print(magic.from_file(filename, mime=True))
-    allowed_mime = magic.from_file(filename, mime=True) in ['audio/wav', 'video/webm', 'audio/mp4', 'audio/webm', 'audio/ogg', 'audio/vorbis', 'audio/opus','video/mp4']
+    allowed_mime = magic.from_file(filename, mime=True) in ['audio/wav', 'video/webm', 'audio/mp4', 'audio/webm', 'audio/ogg', 'audio/vorbis', 'audio/opus','video/mp4', 'application/octet-stream']
 
 
     return allowed_extension and allowed_mime
@@ -376,7 +375,7 @@ def upload_audio():
                         return 'Failed to submit data.'
 
                 else:
-                    #os.remove(temp_path)  # Remove temp file if not allowed
+                    os.remove(temp_path)  # Remove temp file if not allowed
                     response["error"] = "Invalid file type"
                     break
             else:
