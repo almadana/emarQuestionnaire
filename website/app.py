@@ -23,7 +23,7 @@ app = Flask(__name__)
 app.secret_key = app_key  # Set your secret key here
 
 
-ALLOWED_EXTENSIONS = {'wav', 'mp3','webm','ogg','m4a'}
+ALLOWED_EXTENSIONS = {'wav', 'mp3','webm','ogg','oga','m4a','opus'}
 
 def generate_random_string(length=8):
     # Generates a random string of a given length
