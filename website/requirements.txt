@@ -1,4 +1,4 @@
 Flask
-mysql-connector-python==8.0.28
+mysql-connector-python=8.0.23
 werkzeug
 python-magic
