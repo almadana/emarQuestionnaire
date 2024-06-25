@@ -21,7 +21,7 @@ with open(get_path("app_key.txt"), 'r') as file:
 
 app = Flask(__name__)
 app.secret_key = app_key  # Set your secret key here
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=120) # dos horas para hacer la tarea
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=120) # dos horas para hacer la tarea
 
 
 
