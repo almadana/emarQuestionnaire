@@ -59,7 +59,7 @@ def create_tables():
 
 
             nQuest = 20
-            q_strings = ["q_" + str(i) + " VARCHAR(10)" for i in range(1,nQuest+1)]
+            q_strings = ["q_" + str(i) + " VARCHAR(15)" for i in range(1,nQuest+1)]
             q_strings = ",\n".join(q_strings)
 
 

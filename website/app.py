@@ -21,6 +21,8 @@ with open(get_path("app_key.txt"), 'r') as file:
 
 app = Flask(__name__)
 app.secret_key = app_key  # Set your secret key here
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=120) # dos horas para hacer la tarea
+
 
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3','webm','ogg','oga','m4a','opus'}
@@ -84,6 +86,9 @@ def sociodemo():
     participant_id = generate_random_string()
     # Store the participant ID in session for later use
     session["participant_id"] = participant_id
+    session.permanent = True
+
+
 
     return render_template('sociodemo.html')
 
@@ -356,6 +361,8 @@ def upload_audio():
             print(audio_file.filename)
             if audio_file:
                 file_extension = audio_file.filename.rsplit('.', 1)[1].lower()
+                if participant_id:
+                    participant_id = generate_random_string()
                 new_filename = f"{participant_id}_{key}.{file_extension}"
                 temp_path = os.path.join(get_path('temp/'), new_filename)
                 audio_file.save(temp_path)  # Temporarily save file
