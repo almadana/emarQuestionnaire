@@ -17,7 +17,7 @@ db_config = {
     'user': db_user,
     'password': db_pass,
     #'password': 'goU0oLgYwsc4JXiA_',
-    'database': 'canna_emar'
+    'database': 'emar'
 }
 
 
