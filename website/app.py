@@ -354,14 +354,14 @@ def allowed_file(filename):
 def upload_audio():
     response = {"success": False}
     try:
-        participant_id = session.get("participant_id")
+        participant_id = session["participant_id"]
 
         for key in request.files:
             audio_file = request.files[key]
             print(audio_file.filename)
             if audio_file:
                 file_extension = audio_file.filename.rsplit('.', 1)[1].lower()
-                if participant_id:
+                if not participant_id:
                     participant_id = generate_random_string()
                 new_filename = f"{participant_id}_{key}.{file_extension}"
                 temp_path = os.path.join(get_path('temp/'), new_filename)
