@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify
-import random, logging, datetime, magic, os, string
+import random, logging, datetime, magic, os, string, re
 import mysql.connector
 from mysql.connector import Error
 from werkzeug.utils import secure_filename
+import html
 
 #logging.basicConfig(filename='app.log', level=logging.DEBUG)
 
@@ -30,6 +31,34 @@ ALLOWED_EXTENSIONS = {'wav', 'mp3','webm','ogg','oga','m4a','opus'}
 def generate_random_string(length=8):
     # Generates a random string of a given length
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
+
+
+def sanitize_text_input(text, max_length=255):
+    """Sanitiza inputs de texto para prevenir XSS y limitar longitud"""
+    if not text:
+        return ""
+    # Escapar HTML para prevenir XSS
+    sanitized = html.escape(str(text).strip())
+    # Limitar longitud
+    return sanitized[:max_length]
+
+
+def validate_email(email):
+    """Valida formato de email básico"""
+    if not email:
+        return False
+    # Regex básico para email
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(email_pattern, email) is not None
+
+
+def validate_phone(phone):
+    """Valida que el teléfono contenga solo números, espacios, guiones y paréntesis"""
+    if not phone:
+        return True  # El teléfono es opcional
+    # Permitir solo números, espacios, guiones, paréntesis y el símbolo +
+    phone_pattern = r'^[0-9\s\-\+\(\)]+$'
+    return re.match(phone_pattern, phone) is not None
 
 
 # open mysql server credentials file
@@ -99,20 +128,33 @@ def submit_sociodemo():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Extracting form data
-        name = request.form['name']
-        age = request.form['age']
-        sex = request.form['sex']
-        education_level = request.form['education']
-        country_of_origin = request.form['country']
-        years_in_uruguay = request.form['years_in_uruguay']
+        # Extracting and sanitizing form data
+        name = sanitize_text_input(request.form.get('name', ''), max_length=255)
+        age = request.form.get('age', '')
+        sex = sanitize_text_input(request.form.get('sex', ''), max_length=50)
+        education_level = sanitize_text_input(request.form.get('education', ''), max_length=100)
+        country_of_origin = sanitize_text_input(request.form.get('country', ''), max_length=100)
+        years_in_uruguay = request.form.get('years_in_uruguay', '')
         if years_in_uruguay == '':
             years_in_uruguay = -1
-        residence = request.form['residence']
-        email = request.form['email']
-        phone = request.form['phone']
-        ejer_sino = request.form['ejerSN']
-        ejer_freq = request.form['ejercicio-freq']
+        residence = sanitize_text_input(request.form.get('residence', ''), max_length=100)
+        email = request.form.get('email', '').strip()
+        phone = sanitize_text_input(request.form.get('phone', ''), max_length=100)
+        ejer_sino = sanitize_text_input(request.form.get('ejerSN', ''), max_length=50)
+        ejer_freq = sanitize_text_input(request.form.get('ejercicio-freq', ''), max_length=50)
+
+        # Validaciones
+        if not name:
+            return 'El nombre es requerido.', 400
+        
+        if not validate_email(email):
+            return 'El email no tiene un formato válido.', 400
+        
+        if not validate_phone(phone):
+            return 'El teléfono contiene caracteres no válidos.', 400
+        
+        # Sanitizar email
+        email = sanitize_text_input(email, max_length=255)
 
         # Insert data into the database
         sql = """INSERT INTO sociodemographic_data
@@ -178,10 +220,31 @@ def submit_cq():
         participant_id = session["participant_id"]
 
         # Extracting form data
-
         nQuest = 20
-        q_responses = [request.form.get("q"+str(i)) for i in range(1,nQuest+1)]
-        q_responses.insert(0,participant_id)
+        q_responses = []
+        
+        for i in range(1, nQuest+1):
+            response = request.form.get("q"+str(i), "")
+            
+            # Sanitizar campos de texto libre
+            if i == 2:  # q2: edad (number input)
+                # Validar que sea un número válido
+                try:
+                    age = int(response) if response else 0
+                    if age < 0 or age > 120:
+                        return 'Edad no válida. Debe estar entre 0 y 120.', 400
+                    q_responses.append(str(age))
+                except ValueError:
+                    return 'La edad debe ser un número válido.', 400
+            elif i == 20:  # q20: campo de texto libre "Otros"
+                # Sanitizar texto libre
+                sanitized = sanitize_text_input(response, max_length=500)
+                q_responses.append(sanitized)
+            else:
+                # Otros campos son radio buttons, pero sanitizamos por seguridad
+                q_responses.append(sanitize_text_input(response, max_length=50))
+        
+        q_responses.insert(0, participant_id)
 
         q_strings = ["q_" + str(i) for i in range(1,nQuest+1)]
         q_strings = ",".join(q_strings)
@@ -358,28 +421,50 @@ def upload_audio():
 
         for key in request.files:
             audio_file = request.files[key]
-            print(audio_file.filename)
-            if audio_file:
-                file_extension = audio_file.filename.rsplit('.', 1)[1].lower()
+            if audio_file and audio_file.filename:
+                # Sanitizar nombre de archivo con secure_filename
+                original_filename = secure_filename(audio_file.filename)
+                print(f"Processing file: {original_filename}")
+                
+                # Verificar que el archivo tenga extensión
+                if '.' not in original_filename:
+                    response["error"] = "Archivo sin extensión válida"
+                    break
+                
+                file_extension = original_filename.rsplit('.', 1)[1].lower()
+                
+                # Verificar extensión permitida
+                if file_extension not in ALLOWED_EXTENSIONS:
+                    response["error"] = f"Extensión no permitida: {file_extension}"
+                    break
+                
                 if not participant_id:
                     participant_id = generate_random_string()
-                new_filename = f"{participant_id}_{key}.{file_extension}"
+                
+                # Sanitizar el key también
+                safe_key = sanitize_text_input(key, max_length=20)
+                new_filename = f"{participant_id}_{safe_key}.{file_extension}"
                 temp_path = os.path.join(get_path('temp/'), new_filename)
+                
                 audio_file.save(temp_path)  # Temporarily save file
+                
                 if allowed_file(temp_path):  # Check MIME type
                     final_path = os.path.join(get_path('data/audio/'), new_filename)
                     os.rename(temp_path, final_path)
                     try:
                         conn = get_db_connection()
                         cursor = conn.cursor()                            
-                        cursor.execute("INSERT INTO audio_files (filename, q_id, participant_id) VALUES (%s, %s, %s)", (new_filename, key, participant_id))
+                        cursor.execute("INSERT INTO audio_files (filename, q_id, participant_id) VALUES (%s, %s, %s)", (new_filename, safe_key, participant_id))
                         conn.commit()
                         cursor.close()
                         conn.close()
                         response["success"] = True
                     except Error as e:
                         print("Error while connecting to MySQL", e)
-                        return 'Failed to submit data.'
+                        # Limpiar archivo si falla la BD
+                        if os.path.exists(final_path):
+                            os.remove(final_path)
+                        return jsonify({"success": False, "error": "Failed to save to database"})
 
                 else:
                     os.remove(temp_path)  # Remove temp file if not allowed
@@ -389,7 +474,8 @@ def upload_audio():
                 response["error"] = "Invalid file extension or no file found"
                 break
     except Exception as e:
-        response["error"] = str(e)
+        print(f"Error in upload_audio: {str(e)}")
+        response["error"] = "Error al procesar el archivo"
 
     return jsonify(response)
 
