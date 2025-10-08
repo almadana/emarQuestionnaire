@@ -14,10 +14,13 @@
     <main>
     <form action="/submit-sociodemo" method="post">
 
-        <label for="age" class="info-q">Edad:</label><br>
+        <label for="name" class="info-q">1. Nombre y apellido:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="age" class="info-q">2. Edad:</label><br>
         <input type="number" id="age" name="age" required><br><br>
 
-        <label for="sex" class="info-q">Sexo:</label><br>
+        <label class="info-q">3. Sexo:</label><br>
         <input type="radio" id="male" name="sex" value="Varón" required onchange="genderCheck()">
         <label for="male">Varón</label><br>
         <input type="radio" id="female" name="sex" value="Mujer" onchange="genderCheck()">
@@ -29,10 +32,9 @@
         <div id="div-prefiero" style="display: none;">
             <input type="text" id="prefiero-text" name="prefiero-text">
         </div>
-        
         <br><br>
 
-        <label for="education" class="info-q">Nivel educativo:</label><br>
+        <label for="education" class="info-q">4. Nivel educativo:</label><br>
         <select name="education" id="education" required>
             <option value="" selected disabled>Elige una opción</option>
             <option value="Primaria incompleta">Primaria incompleta</option>
@@ -43,26 +45,13 @@
             <option value="Terciaria completa">Terciaria completa</option>
         </select><br><br>
 
-        <label for="country" class="info-q">País de origen:</label><br>
-        <select name="country" id="country" required>
-            <option value="" selected disabled>Elige una opción</option>
-            <option value="UY">Uruguay</option>
-            <option value="AR">Argentina</option>
-            <option value="BR">Brasil</option>
-            <option value="CH">Chile</option>
-            <option value="CU">Cuba</option>
-            <option value="PY">Paraguay</option>
-            <option value="VE">Venezuela</option>
-            <option value="X">Otro</option>
-        </select><br>
+        <label for="country" class="info-q">5. País de origen:</label><br>
+        <input type="text" id="country" name="country" required><br><br>
 
-        <label for="years_in_uruguay" class="info-q">Años en Uruguay (si aplica):</label><br>
-        <input type="number" id="years_in_uruguay" name="years_in_uruguay"><br><br>
-
-        <label for="residence" class="info-q">Departamento de residencia:</label><br>
+        <label for="residence" class="info-q">6. Departamento de residencia:</label><br>
         <select id="residence" name="residence" required>
             <option value="" selected disabled>Elige una opción</option>
-            <option value="No resido en Uruguay">
+            <option value="No resido en Uruguay">No resido en Uruguay</option>
             <option value="Artigas">Artigas</option>
             <option value="Canelones">Canelones</option>
             <option value="Cerro Largo">Cerro Largo</option>
@@ -82,71 +71,147 @@
             <option value="Soriano">Soriano</option>
             <option value="Tacuarembó">Tacuarembó</option>
             <option value="Treinta y Tres">Treinta y Tres</option>
-        </select><br>
-        <br>
-        <label for="ejerSN" class="info-q">¿Realizas ejercicio físico?</label><br>
-        <input type="radio" id="ejerSI" name="ejerSN" value="Sí" required onchange="exerCheck()">
-        <label for="ejerSI">Sí</label><br>
-        <input type="radio" id="ejerNO" name="ejerSN" value="No" onchange="exerCheck()">
-        <label for="ejerNO">No</label><br>
-        <div id="div-ejercicio" style="display: none;">
-        <br><label class="info-q"> ¿Con qué frecuencia?</label><br>
-            <input type="radio" id="default-ejercicio" name="ejercicio-freq" value="NA" checked style="display:none;">
-            <input type="radio" id="1porsemana" name="ejercicio-freq" value="1_2">
-            <label for="1porsemana">1 o 2 veces por semana</label><br>
-            <input type="radio" id="2porsemana" name="ejercicio-freq" value="3_4">
-            <label for="2porsemana">3 o 4 veces por semana</label><br>
-            <input type="radio" id="3porsemana" name="ejercicio-freq" value="5mas">
-            <label for="3porsemana">5 o más veces por semana</label><br>
+        </select><br><br>
 
-        </div>
-        
-        
-        
-        <br>
-        <p>La siguiente información será accesible sólo a los investigadores del equipo y tiene el fin de contactarte si fueses convocado/a la segunda etapa de la investigación:</p>
-        <label for="name" class="info-q">Nombre y apellido:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
-
-        <label for="email" class="info-q">E-mail:</label><br>
+        <label for="email" class="info-q">7. Mail:</label><br>
         <input type="email" id="email" name="email" required><br><br>
 
-        <label for="phone" class="info-q">Teléfono:</label><br>
+        <label for="phone" class="info-q">8. Teléfono:</label><br>
         <input type="tel" id="phone" name="phone" required><br><br>
-        
-        
 
-        <input type="submit" value="Enviar">
+        <hr>
+        <h3>Salud Mental</h3>
+
+        <label class="info-q">9. ¿Qué familiares (hermanos/as, padres, abuelos) tienen un diagnóstico de alguna patología de salud mental tales como ansiedad, depresión, trastorno bipolar o esquizofrenia?</label><br>
+        <input type="checkbox" id="fam_hermano" name="fam_hermano" value="Hermano/a">
+        <label for="fam_hermano">Hermano/a</label><br>
+        <input type="checkbox" id="fam_padre" name="fam_padre" value="Padre">
+        <label for="fam_padre">Padre</label><br>
+        <input type="checkbox" id="fam_madre" name="fam_madre" value="Madre">
+        <label for="fam_madre">Madre</label><br>
+        <input type="checkbox" id="fam_abuelo" name="fam_abuelo" value="Abuelo/a">
+        <label for="fam_abuelo">Abuelo/a</label><br>
+        <input type="checkbox" id="fam_ninguno" name="fam_ninguno" value="Ninguno">
+        <label for="fam_ninguno">Ninguno</label><br><br>
+
+        <label class="info-q">10. ¿Toma psicofármacos?</label><br>
+        <input type="radio" id="psicofarmacos_si" name="psicofarmacos" value="SI" required onchange="psicoCheck()">
+        <label for="psicofarmacos_si">Sí</label><br>
+        <input type="radio" id="psicofarmacos_no" name="psicofarmacos" value="NO" onchange="psicoCheck()">
+        <label for="psicofarmacos_no">No</label><br><br>
+
+        <div id="div-psicofarmacos" style="display: none;">
+            <label class="info-q">11. ¿Desde hace cuánto?</label><br>
+            <input type="radio" id="tiempo_6m" name="tiempo_psicofarmacos" value="6 meses o menos">
+            <label for="tiempo_6m">6 meses o menos</label><br>
+            <input type="radio" id="tiempo_1a" name="tiempo_psicofarmacos" value="1 año">
+            <label for="tiempo_1a">1 año</label><br>
+            <input type="radio" id="tiempo_2a" name="tiempo_psicofarmacos" value="2 años o más">
+            <label for="tiempo_2a">2 años o más</label><br><br>
+
+            <label class="info-q">12. ¿Cuáles? (elija uno o más de uno)</label><br>
+            <input type="checkbox" id="tipo_antidepresivos" name="tipo_antidepresivos" value="antidepresivos">
+            <label for="tipo_antidepresivos">Antidepresivos (sertralina, venlafaxina, bupropion, escitalopram, fluoxetina, paroxetina, duloxetina, amitriptilina, imipramina)</label><br>
+            
+            <input type="checkbox" id="tipo_ansioliticos" name="tipo_ansioliticos" value="ansioliticos">
+            <label for="tipo_ansioliticos">Ansiolíticos o hipnóticos (clonazepam, flunitrazepam, diazepam, alprazolam, broomazepam, zolpidem, zopiclona)</label><br>
+            
+            <input type="checkbox" id="tipo_neurolepticos" name="tipo_neurolepticos" value="neurolepticos">
+            <label for="tipo_neurolepticos">Neurolépticos/antipsicóticos (haloperidol, clorpromazina, levomepromazina, risperidona, clozapina, olanzapina, quetiapina, aripiprazol, lurasidona)</label><br>
+            
+            <input type="checkbox" id="tipo_reguladores" name="tipo_reguladores" value="reguladores">
+            <label for="tipo_reguladores">Reguladores del humor (litio, ácido valpróico, valproato de sodio, carbamazepina, lamotrigina, topiramato, gabapentina, pregabalina)</label><br><br>
+        </div>
+
+        <label class="info-q">13. Durante el último año y medio, ¿tuvo alguna consulta con psiquiatra en puerta de emergencia?</label><br>
+        <input type="radio" id="emergencia_si" name="emergencia" value="si" required>
+        <label for="emergencia_si">Sí</label><br>
+        <input type="radio" id="emergencia_no" name="emergencia" value="no">
+        <label for="emergencia_no">No</label><br><br>
+
+        <label class="info-q">14. Durante el último año y medio, ¿tuvo algún ingreso de internación en alguna clínica de agudos (de tipo psiquiátrica)?</label><br>
+        <input type="radio" id="internacion_si" name="internacion" value="si" required>
+        <label for="internacion_si">Sí</label><br>
+        <input type="radio" id="internacion_no" name="internacion" value="no">
+        <label for="internacion_no">No</label><br><br>
+
+        <label class="info-q">15. Durante el último año y medio, ¿le hicieron algún diagnóstico de salud mental evaluado por psiquiatra?</label><br>
+        <input type="radio" id="diagnostico_si" name="diagnostico" value="si" required onchange="diagCheck()">
+        <label for="diagnostico_si">Sí</label><br>
+        <input type="radio" id="diagnostico_no" name="diagnostico" value="no" onchange="diagCheck()">
+        <label for="diagnostico_no">No</label><br><br>
+
+        <div id="div-diagnostico" style="display: none;">
+            <label class="info-q">16. ¿Cuál diagnóstico?</label><br>
+            <input type="checkbox" id="diag_psicosis" name="diag_psicosis" value="Psicosis delirante aguda o Episodio psicótico agudo">
+            <label for="diag_psicosis">Psicosis delirante aguda o Episodio psicótico agudo</label><br>
+            
+            <input type="checkbox" id="diag_inducido" name="diag_inducido" value="Episodio psicótico inducido por sustancias">
+            <label for="diag_inducido">Episodio psicótico inducido por sustancias</label><br>
+            
+            <input type="checkbox" id="diag_esquizofrenia" name="diag_esquizofrenia" value="Esquizofrenia">
+            <label for="diag_esquizofrenia">Esquizofrenia</label><br>
+            
+            <input type="checkbox" id="diag_bipolar" name="diag_bipolar" value="Trastorno bipolar">
+            <label for="diag_bipolar">Trastorno bipolar</label><br>
+            
+            <input type="checkbox" id="diag_ansiedad" name="diag_ansiedad" value="Trastorno de ansiedad">
+            <label for="diag_ansiedad">Trastorno de ansiedad</label><br>
+            
+            <input type="checkbox" id="diag_depresion" name="diag_depresion" value="Depresión">
+            <label for="diag_depresion">Depresión</label><br>
+            
+            <input type="checkbox" id="diag_esquizotipica" name="diag_esquizotipica" value="Trastorno de personalidad esquizotípica">
+            <label for="diag_esquizotipica">Trastorno de personalidad esquizotípica</label><br>
+            
+            <input type="checkbox" id="diag_esquizoide" name="diag_esquizoide" value="Trastorno de personalidad esquizoide">
+            <label for="diag_esquizoide">Trastorno de personalidad esquizoide</label><br><br>
+        </div>
+
+        <input type="submit" value="Siguiente">
     </form>
     </main>
 
     <script>
     function genderCheck() {
-        // Check if the specific radio button is selected
         var sd = document.getElementById('self_describe');
         var div_pref = document.getElementById('div-prefiero');
-
-        // Show or hide the text field based on the radio button selection
         if (sd.checked) {
             div_pref.style.display = 'block';
         } else {
             div_pref.style.display = 'none';
         }
     }
-    function exerCheck() {
-        // Check if the specific radio button is selected
-        var sd = document.getElementById('ejerSI');
-        var div_pref = document.getElementById('div-ejercicio');
 
-        // Show or hide the text field based on the radio button selection
-        if (sd.checked) {
-            div_pref.style.display = 'block';
-            div_pref.querySelector('input').required = true;
+    function psicoCheck() {
+        var si = document.getElementById('psicofarmacos_si');
+        var div = document.getElementById('div-psicofarmacos');
+        if (si.checked) {
+            div.style.display = 'block';
+            // Make fields required
+            document.querySelectorAll('#div-psicofarmacos input[type="radio"]').forEach(function(input) {
+                if (input.name === 'tiempo_psicofarmacos') {
+                    input.required = true;
+                }
+            });
         } else {
-            div_pref.style.display = 'none';
-            div_pref.querySelector('input').required = false;
+            div.style.display = 'none';
+            // Remove required
+            document.querySelectorAll('#div-psicofarmacos input[type="radio"]').forEach(function(input) {
+                input.required = false;
+            });
         }
     }
-</script>    
+
+    function diagCheck() {
+        var si = document.getElementById('diagnostico_si');
+        var div = document.getElementById('div-diagnostico');
+        if (si.checked) {
+            div.style.display = 'block';
+        } else {
+            div.style.display = 'none';
+        }
+    }
+    </script>    
 </body>
 </html>

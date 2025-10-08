@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cuestionario de Actividad Física (IPAQ) - Estudio sobre efectos del Cannabis</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../static/css/style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link rel="canonical" href="https://emar.cicea.uy">
+</head>
+<body>
+    <h2>Cuestionario de Actividad Física - IPAQ (2/7)</h2>
+    <main>
+    <form action="/submit-ipaq" method="post">
+
+        <h3>Actividades Físicas Intensas</h3>
+        <p>Piense en todas las actividades <strong>intensas</strong> que usted realizó en los últimos 7 días (ej: levantar peso pesado, trotar, fútbol, voley, tenis, bicicleta, nado, ejercicio aeróbico, levantar pesas)</p>
+
+        <label for="dias_intensa" class="info-q">Durante los últimos 7 días, ¿en cuántos realizó actividad física intensa?</label><br>
+        <input type="number" id="dias_intensa" name="dias_intensa" min="0" max="7" placeholder="Días por semana" required><br><br>
+
+        <label class="info-q">Habitualmente, ¿cuánto tiempo en total le dedicó a una actividad física intensa por cada día?</label><br>
+        <label for="horas_intensa">Horas por día:</label>
+        <input type="number" id="horas_intensa" name="horas_intensa" min="0" max="24" placeholder="0" required style="width: 80px;">
+        <label for="minutos_intensa" style="margin-left: 20px;">Minutos por día:</label>
+        <input type="number" id="minutos_intensa" name="minutos_intensa" min="0" max="59" placeholder="0" required style="width: 80px;"><br><br>
+
+        <hr>
+
+        <h3>Actividades Físicas Moderadas</h3>
+        <p>Ahora piense en las actividades <strong>moderadas</strong> que usted realizó en los últimos 7 días (ej: transportar peso liviano, bicicleta a ritmo paseo, baile, danza o ritmos, tai-chi)</p>
+        <p><em>Tome en cuenta sólo aquellas a las que dedicó al menos 10 minutos seguidos por cada día</em></p>
+
+        <label for="dias_moderada" class="info-q">Durante los últimos 7 días, ¿en cuántos realizó actividad física moderada?</label><br>
+        <input type="number" id="dias_moderada" name="dias_moderada" min="0" max="7" placeholder="Días por semana" required><br><br>
+
+        <label class="info-q">Habitualmente, ¿cuánto tiempo en total le dedicó a una actividad física moderada por cada día?</label><br>
+        <label for="horas_moderada">Horas por día:</label>
+        <input type="number" id="horas_moderada" name="horas_moderada" min="0" max="24" placeholder="0" required style="width: 80px;">
+        <label for="minutos_moderada" style="margin-left: 20px;">Minutos por día:</label>
+        <input type="number" id="minutos_moderada" name="minutos_moderada" min="0" max="59" placeholder="0" required style="width: 80px;"><br><br>
+
+        <hr>
+
+        <h3>Caminar</h3>
+        <p>Ahora piense en el tiempo que usted le dedicó a <strong>caminar</strong> en los últimos 7 días (caminar en el trabajo, en casa, para trasladarse de un lugar a otro, o para recreación o ejercicio)</p>
+
+        <label for="dias_caminar" class="info-q">Durante los últimos 7 días, ¿en cuántos caminó al menos 10 minutos seguidos?</label><br>
+        <input type="number" id="dias_caminar" name="dias_caminar" min="0" max="7" placeholder="Días por semana" required><br><br>
+
+        <label class="info-q">¿Cuánto tiempo en total le dedicó a caminar en uno de esos días?</label><br>
+        <label for="horas_caminar">Horas por día:</label>
+        <input type="number" id="horas_caminar" name="horas_caminar" min="0" max="24" placeholder="0" required style="width: 80px;">
+        <label for="minutos_caminar" style="margin-left: 20px;">Minutos por día:</label>
+        <input type="number" id="minutos_caminar" name="minutos_caminar" min="0" max="59" placeholder="0" required style="width: 80px;"><br><br>
+
+        <hr>
+
+        <h3>Estar Sentado</h3>
+        <p>Esta última pregunta es acerca del tiempo que pasó usted <strong>sentado</strong> durante los días hábiles de los últimos 7 días (incluyendo tiempo dedicado al trabajo, en la casa, en una clase, durante el tiempo libre, incluyendo tiempo sentado ante un escritorio, leyendo, visitando amigos, viajando en ómnibus o sentado o recostado mirando televisión)</p>
+
+        <label class="info-q">Durante los últimos 7 días, ¿cuánto tiempo pasó sentado en un día hábil?</label><br>
+        <label for="horas_sentado">Horas por día:</label>
+        <input type="number" id="horas_sentado" name="horas_sentado" min="0" max="24" placeholder="0" required style="width: 80px;">
+        <label for="minutos_sentado" style="margin-left: 20px;">Minutos por día:</label>
+        <input type="number" id="minutos_sentado" name="minutos_sentado" min="0" max="59" placeholder="0" required style="width: 80px;"><br><br>
+
+        <input type="submit" value="Siguiente">
+    </form>
+    </main>
+</body>
+</html>
+

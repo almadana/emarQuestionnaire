@@ -84,16 +84,82 @@ def get_db_connection():
     return conn
 
 
+def validate_participant_id(participant_id):
+    """Valida que el participant_id exista en la base de datos de ronda 1"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Buscar el participant_id en la tabla de ronda 1
+        sql = "SELECT participant_id, name FROM sociodemographic_data_ronda1 WHERE participant_id = %s"
+        cursor.execute(sql, (participant_id,))
+        result = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        if result:
+            return True, result[1]  # Retorna True y el nombre del participante
+        else:
+            return False, None
+    except Error as e:
+        print(f"Error validating participant_id: {e}")
+        return False, None
+
+
 
 
 if __name__ == '__main__':
     app.run(debug=True)
 
-#WELCOME / INFORMATION / CONSENT / SOCIODEMO / TRAUMATIC / CANNABIS / SNS / IDEAS REF / SALIENCIA / OPEN Q / thanks
+#WELCOME / INFORMATION / CONSENT / SOCIODEMO / IPAQ / CANNABIS / SNS / IDEAS REF / SALIENCIA / OPEN Q / thanks
+# (TRAUMATIC EXPERIENCES QUESTIONNAIRE REMOVED FROM FLOW)
 
 @app.route('/')
 def welcome():
-    return render_template('welcome.html')
+    # Capturar participant_id del URL (ej: /?pid=ABC123)
+    pid = request.args.get('pid', '').strip()
+    
+    # Si viene pid en URL, validarlo y guardarlo en sesión
+    if pid:
+        is_valid, participant_name = validate_participant_id(pid)
+        if is_valid:
+            session['participant_id'] = pid
+            session['participant_name'] = participant_name
+            session['pid_validated'] = True
+            session.permanent = True
+            return render_template('welcome.html', pid_from_url=True, participant_name=participant_name)
+        else:
+            # PID inválido
+            return render_template('welcome.html', pid_from_url=True, pid_invalid=True)
+    
+    # Si no viene pid, verificar si ya está en sesión
+    if session.get('pid_validated'):
+        participant_name = session.get('participant_name', '')
+        return render_template('welcome.html', pid_from_url=True, participant_name=participant_name)
+    
+    # Si no hay pid, mostrar modal para pedirlo
+    return render_template('welcome.html', pid_from_url=False)
+
+
+@app.route('/validate-pid', methods=['POST'])
+def validate_pid():
+    """Valida el participant_id ingresado manualmente"""
+    pid = request.form.get('pid', '').strip()
+    
+    if not pid:
+        return jsonify({'valid': False, 'error': 'Por favor ingresa tu código de participante'})
+    
+    is_valid, participant_name = validate_participant_id(pid)
+    
+    if is_valid:
+        session['participant_id'] = pid
+        session['participant_name'] = participant_name
+        session['pid_validated'] = True
+        session.permanent = True
+        return jsonify({'valid': True, 'participant_name': participant_name})
+    else:
+        return jsonify({'valid': False, 'error': 'Código de participante no encontrado. Por favor verifica el código.'})
 
 
 @app.route('/info')
@@ -112,14 +178,13 @@ def submit_consent():
 
 @app.route('/sociodemo')
 def sociodemo():
-    participant_id = generate_random_string()
-    # Store the participant ID in session for later use
-    session["participant_id"] = participant_id
-    session.permanent = True
-
-
-
-    return render_template('sociodemo.html')
+    # El participant_id ya debe estar en la sesión (validado en welcome)
+    if 'participant_id' not in session or not session.get('pid_validated'):
+        # Si no está validado, redirigir a welcome
+        return redirect(url_for('welcome'))
+    
+    participant_name = session.get('participant_name', '')
+    return render_template('sociodemo.html', participant_name=participant_name)
 
 @app.route('/submit-sociodemo', methods=['POST'])
 def submit_sociodemo():
@@ -128,20 +193,48 @@ def submit_sociodemo():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Extracting and sanitizing form data
+        # Extracting and sanitizing basic demographic data
         name = sanitize_text_input(request.form.get('name', ''), max_length=255)
         age = request.form.get('age', '')
         sex = sanitize_text_input(request.form.get('sex', ''), max_length=50)
+        prefiero_text = sanitize_text_input(request.form.get('prefiero-text', ''), max_length=100)
         education_level = sanitize_text_input(request.form.get('education', ''), max_length=100)
         country_of_origin = sanitize_text_input(request.form.get('country', ''), max_length=100)
-        years_in_uruguay = request.form.get('years_in_uruguay', '')
-        if years_in_uruguay == '':
-            years_in_uruguay = -1
         residence = sanitize_text_input(request.form.get('residence', ''), max_length=100)
         email = request.form.get('email', '').strip()
         phone = sanitize_text_input(request.form.get('phone', ''), max_length=100)
-        ejer_sino = sanitize_text_input(request.form.get('ejerSN', ''), max_length=50)
-        ejer_freq = sanitize_text_input(request.form.get('ejercicio-freq', ''), max_length=50)
+
+        # Health mental history - familiares (checkboxes)
+        fam_hermano = 1 if request.form.get('fam_hermano') else 0
+        fam_padre = 1 if request.form.get('fam_padre') else 0
+        fam_madre = 1 if request.form.get('fam_madre') else 0
+        fam_abuelo = 1 if request.form.get('fam_abuelo') else 0
+        fam_ninguno = 1 if request.form.get('fam_ninguno') else 0
+
+        # Psicofármacos
+        psicofarmacos = sanitize_text_input(request.form.get('psicofarmacos', ''), max_length=10)
+        tiempo_psicofarmacos = sanitize_text_input(request.form.get('tiempo_psicofarmacos', ''), max_length=50)
+        
+        # Tipos de psicofármacos (checkboxes)
+        tipo_antidepresivos = 1 if request.form.get('tipo_antidepresivos') else 0
+        tipo_ansioliticos = 1 if request.form.get('tipo_ansioliticos') else 0
+        tipo_neurolepticos = 1 if request.form.get('tipo_neurolepticos') else 0
+        tipo_reguladores = 1 if request.form.get('tipo_reguladores') else 0
+
+        # Consultas y diagnósticos
+        emergencia = sanitize_text_input(request.form.get('emergencia', ''), max_length=10)
+        internacion = sanitize_text_input(request.form.get('internacion', ''), max_length=10)
+        diagnostico = sanitize_text_input(request.form.get('diagnostico', ''), max_length=10)
+
+        # Tipos de diagnóstico (checkboxes)
+        diag_psicosis = 1 if request.form.get('diag_psicosis') else 0
+        diag_inducido = 1 if request.form.get('diag_inducido') else 0
+        diag_esquizofrenia = 1 if request.form.get('diag_esquizofrenia') else 0
+        diag_bipolar = 1 if request.form.get('diag_bipolar') else 0
+        diag_ansiedad = 1 if request.form.get('diag_ansiedad') else 0
+        diag_depresion = 1 if request.form.get('diag_depresion') else 0
+        diag_esquizotipica = 1 if request.form.get('diag_esquizotipica') else 0
+        diag_esquizoide = 1 if request.form.get('diag_esquizoide') else 0
 
         # Validaciones
         if not name:
@@ -155,53 +248,149 @@ def submit_sociodemo():
         
         # Sanitizar email
         email = sanitize_text_input(email, max_length=255)
+        
+        # Combinar sexo con texto personalizado si aplica
+        if sex == "Prefiero autodescribirme" and prefiero_text:
+            sex = f"Prefiero autodescribirme: {prefiero_text}"
 
         # Insert data into the database
         sql = """INSERT INTO sociodemographic_data
-                    (participant_id, name, age, sex, education_level, country_of_origin,
-                    years_in_uruguay, residence, ejer_sino, ejer_freq, email, phone)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-        cursor.execute(sql, (participant_id, name, age, sex, education_level, country_of_origin, years_in_uruguay, residence, ejer_sino, ejer_freq, email, phone))
+                    (participant_id, name, age, sex, education_level, country_of_origin, residence, email, phone,
+                     fam_hermano, fam_padre, fam_madre, fam_abuelo, fam_ninguno,
+                     psicofarmacos, tiempo_psicofarmacos, 
+                     tipo_antidepresivos, tipo_ansioliticos, tipo_neurolepticos, tipo_reguladores,
+                     emergencia, internacion, diagnostico,
+                     diag_psicosis, diag_inducido, diag_esquizofrenia, diag_bipolar, 
+                     diag_ansiedad, diag_depresion, diag_esquizotipica, diag_esquizoide)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                            %s, %s, %s, %s, %s,
+                            %s, %s, %s, %s, %s, %s,
+                            %s, %s, %s,
+                            %s, %s, %s, %s, %s, %s, %s, %s)"""
+        
+        cursor.execute(sql, (participant_id, name, age, sex, education_level, country_of_origin, residence, email, phone,
+                            fam_hermano, fam_padre, fam_madre, fam_abuelo, fam_ninguno,
+                            psicofarmacos, tiempo_psicofarmacos,
+                            tipo_antidepresivos, tipo_ansioliticos, tipo_neurolepticos, tipo_reguladores,
+                            emergencia, internacion, diagnostico,
+                            diag_psicosis, diag_inducido, diag_esquizofrenia, diag_bipolar,
+                            diag_ansiedad, diag_depresion, diag_esquizotipica, diag_esquizoide))
         conn.commit()
         cursor.close()
         conn.close()
-        return redirect(url_for('texp'))
+        return redirect(url_for('ipaq'))  # Redirige al cuestionario IPAQ
     except Error as e:
         print("Error while connecting to MySQL", e)
         return 'Failed to submit data.'
 
 
-@app.route('/texp')
-def texp():
-    return render_template('traumatic_experiences.html')
+# =============================================================================
+# TRAUMATIC EXPERIENCES QUESTIONNAIRE - DISABLED
+# Uncomment these routes if you want to restore the traumatic experiences questionnaire
+# =============================================================================
+#
+# @app.route('/texp')
+# def texp():
+#     return render_template('traumatic_experiences.html')
+#
+# @app.route('/submit-texp', methods=['POST'])
+# def submit_texp():
+#     participant_id = session["participant_id"]
+#
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()    
+#         nQuest = 36
+#         q_responses = [request.form.get("q"+str(i)) for i in range(1,nQuest+1)]
+#         q_responses.insert(0,participant_id)
+#
+#         q_strings = ["q_" + str(i) for i in range(1,nQuest+1)]
+#         q_strings = ",".join(q_strings)
+#         
+#         format_strings = ["%s" for i in range(0,nQuest+1)]
+#         format_strings = ",".join(format_strings)
+#
+#         # Insert data into the database
+#         sql = "INSERT INTO traumatic_experiences_responses \n (participant_id, " +  q_strings + """)
+#                 VALUES (""" + format_strings  + ")"
+#         cursor.execute(sql, tuple(q_responses))
+#         
+#         conn.commit()
+#         cursor.close()
+#         conn.close()
+#         return redirect(url_for('cannabis_qst'))
+#
+#     except Error as e:
+#         print("Error while connecting to MySQL", e)
+#         return 'Failed to submit data.'
+#
+# =============================================================================
 
-@app.route('/submit-texp', methods=['POST'])
-def submit_texp():
+
+@app.route('/ipaq')
+def ipaq():
+    return render_template('ipaq.html')
+
+@app.route('/submit-ipaq', methods=['POST'])
+def submit_ipaq():
     participant_id = session["participant_id"]
-
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()    
-        nQuest = 36
-        q_responses = [request.form.get("q"+str(i)) for i in range(1,nQuest+1)]
-        q_responses.insert(0,participant_id)
+        cursor = conn.cursor()
 
-        q_strings = ["q_" + str(i) for i in range(1,nQuest+1)]
-        q_strings = ",".join(q_strings)
-        
-        format_strings = ["%s" for i in range(0,nQuest+1)]
-        format_strings = ",".join(format_strings)
+        # Actividades intensas
+        dias_intensa = request.form.get('dias_intensa', 0)
+        horas_intensa = request.form.get('horas_intensa', 0)
+        minutos_intensa = request.form.get('minutos_intensa', 0)
+
+        # Actividades moderadas
+        dias_moderada = request.form.get('dias_moderada', 0)
+        horas_moderada = request.form.get('horas_moderada', 0)
+        minutos_moderada = request.form.get('minutos_moderada', 0)
+
+        # Caminar
+        dias_caminar = request.form.get('dias_caminar', 0)
+        horas_caminar = request.form.get('horas_caminar', 0)
+        minutos_caminar = request.form.get('minutos_caminar', 0)
+
+        # Estar sentado
+        horas_sentado = request.form.get('horas_sentado', 0)
+        minutos_sentado = request.form.get('minutos_sentado', 0)
+
+        # Validar que sean números
+        try:
+            dias_intensa = int(dias_intensa)
+            horas_intensa = int(horas_intensa)
+            minutos_intensa = int(minutos_intensa)
+            dias_moderada = int(dias_moderada)
+            horas_moderada = int(horas_moderada)
+            minutos_moderada = int(minutos_moderada)
+            dias_caminar = int(dias_caminar)
+            horas_caminar = int(horas_caminar)
+            minutos_caminar = int(minutos_caminar)
+            horas_sentado = int(horas_sentado)
+            minutos_sentado = int(minutos_sentado)
+        except ValueError:
+            return 'Todos los campos deben ser números válidos.', 400
 
         # Insert data into the database
-        sql = "INSERT INTO traumatic_experiences_responses \n (participant_id, " +  q_strings + """)
-                VALUES (""" + format_strings  + ")"
-        cursor.execute(sql, tuple(q_responses))
+        sql = """INSERT INTO ipaq_responses
+                    (participant_id, 
+                     dias_intensa, horas_intensa, minutos_intensa,
+                     dias_moderada, horas_moderada, minutos_moderada,
+                     dias_caminar, horas_caminar, minutos_caminar,
+                     horas_sentado, minutos_sentado)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
         
+        cursor.execute(sql, (participant_id, 
+                            dias_intensa, horas_intensa, minutos_intensa,
+                            dias_moderada, horas_moderada, minutos_moderada,
+                            dias_caminar, horas_caminar, minutos_caminar,
+                            horas_sentado, minutos_sentado))
         conn.commit()
         cursor.close()
         conn.close()
         return redirect(url_for('cannabis_qst'))
-
     except Error as e:
         print("Error while connecting to MySQL", e)
         return 'Failed to submit data.'
