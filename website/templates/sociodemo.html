@@ -12,72 +12,77 @@
 <body>
     <h2>Cuestionario Sociodemográfico (1/7)</h2>
     <main>
+    {% if existing_data %}
+    <div style="background-color: #e3f2fd; padding: 15px; margin-bottom: 20px; border-left: 4px solid #2196F3; border-radius: 4px;">
+        <strong>ℹ️ Información:</strong> Hemos cargado tus datos de la Ronda 1. Puedes revisarlos y modificarlos si es necesario, y completar las nuevas preguntas sobre salud mental.
+    </div>
+    {% endif %}
     <form action="/submit-sociodemo" method="post">
 
         <label for="name" class="info-q">1. Nombre y apellido:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+        <input type="text" id="name" name="name" value="{{ existing_data.name if existing_data else '' }}" required><br><br>
 
         <label for="age" class="info-q">2. Edad:</label><br>
-        <input type="number" id="age" name="age" required><br><br>
+        <input type="number" id="age" name="age" value="{{ existing_data.age if existing_data else '' }}" required><br><br>
 
         <label class="info-q">3. Sexo:</label><br>
-        <input type="radio" id="male" name="sex" value="Varón" required onchange="genderCheck()">
+        <input type="radio" id="male" name="sex" value="Varón" {% if existing_data and existing_data.sex == 'Varón' %}checked{% endif %} required onchange="genderCheck()">
         <label for="male">Varón</label><br>
-        <input type="radio" id="female" name="sex" value="Mujer" onchange="genderCheck()">
+        <input type="radio" id="female" name="sex" value="Mujer" {% if existing_data and existing_data.sex == 'Mujer' %}checked{% endif %} onchange="genderCheck()">
         <label for="female">Mujer</label><br>
-        <input type="radio" id="no_say" name="sex" value="Prefiero no decirlo" onchange="genderCheck()">
+        <input type="radio" id="no_say" name="sex" value="Prefiero no decirlo" {% if existing_data and existing_data.sex == 'Prefiero no decirlo' %}checked{% endif %} onchange="genderCheck()">
         <label for="no_say">Prefiero no decirlo</label><br>
-        <input type="radio" id="self_describe" name="sex" value="Prefiero autodescribirme" onchange="genderCheck()">
+        <input type="radio" id="self_describe" name="sex" value="Prefiero autodescribirme" {% if existing_data and existing_data.sex == 'Prefiero autodescribirme' %}checked{% endif %} onchange="genderCheck()">
         <label for="self_describe">Prefiero autodescribirme</label>
-        <div id="div-prefiero" style="display: none;">
-            <input type="text" id="prefiero-text" name="prefiero-text">
+        <div id="div-prefiero" style="display: {% if existing_data and existing_data.sex == 'Prefiero autodescribirme' %}block{% else %}none{% endif %};">
+            <input type="text" id="prefiero-text" name="prefiero-text" value="{{ existing_data.prefiero_text if existing_data else '' }}">
         </div>
         <br><br>
 
         <label for="education" class="info-q">4. Nivel educativo:</label><br>
         <select name="education" id="education" required>
-            <option value="" selected disabled>Elige una opción</option>
-            <option value="Primaria incompleta">Primaria incompleta</option>
-            <option value="Primaria completa">Primaria completa</option>
-            <option value="Secundaria incompleta">Secundaria incompleta</option>
-            <option value="Secundaria completa">Secundaria completa</option>
-            <option value="Terciaria incompleta">Terciaria incompleta</option>
-            <option value="Terciaria completa">Terciaria completa</option>
+            <option value="" {% if not existing_data or not existing_data.education_level %}selected disabled{% endif %}>Elige una opción</option>
+            <option value="Primaria incompleta" {% if existing_data and existing_data.education_level == 'Primaria incompleta' %}selected{% endif %}>Primaria incompleta</option>
+            <option value="Primaria completa" {% if existing_data and existing_data.education_level == 'Primaria completa' %}selected{% endif %}>Primaria completa</option>
+            <option value="Secundaria incompleta" {% if existing_data and existing_data.education_level == 'Secundaria incompleta' %}selected{% endif %}>Secundaria incompleta</option>
+            <option value="Secundaria completa" {% if existing_data and existing_data.education_level == 'Secundaria completa' %}selected{% endif %}>Secundaria completa</option>
+            <option value="Terciaria incompleta" {% if existing_data and existing_data.education_level == 'Terciaria incompleta' %}selected{% endif %}>Terciaria incompleta</option>
+            <option value="Terciaria completa" {% if existing_data and existing_data.education_level == 'Terciaria completa' %}selected{% endif %}>Terciaria completa</option>
         </select><br><br>
 
         <label for="country" class="info-q">5. País de origen:</label><br>
-        <input type="text" id="country" name="country" required><br><br>
+        <input type="text" id="country" name="country" value="{{ existing_data.country_of_origin if existing_data else '' }}" required><br><br>
 
         <label for="residence" class="info-q">6. Departamento de residencia:</label><br>
         <select id="residence" name="residence" required>
-            <option value="" selected disabled>Elige una opción</option>
-            <option value="No resido en Uruguay">No resido en Uruguay</option>
-            <option value="Artigas">Artigas</option>
-            <option value="Canelones">Canelones</option>
-            <option value="Cerro Largo">Cerro Largo</option>
-            <option value="Colonia">Colonia</option>
-            <option value="Durazno">Durazno</option>
-            <option value="Flores">Flores</option>
-            <option value="Florida">Florida</option>
-            <option value="Lavalleja">Lavalleja</option>
-            <option value="Maldonado">Maldonado</option>
-            <option value="Montevideo">Montevideo</option>
-            <option value="Paysandú">Paysandú</option>
-            <option value="Río Negro">Río Negro</option>
-            <option value="Rivera">Rivera</option>
-            <option value="Rocha">Rocha</option>
-            <option value="Salto">Salto</option>
-            <option value="San José">San José</option>
-            <option value="Soriano">Soriano</option>
-            <option value="Tacuarembó">Tacuarembó</option>
-            <option value="Treinta y Tres">Treinta y Tres</option>
+            <option value="" {% if not existing_data or not existing_data.residence %}selected disabled{% endif %}>Elige una opción</option>
+            <option value="No resido en Uruguay" {% if existing_data and existing_data.residence == 'No resido en Uruguay' %}selected{% endif %}>No resido en Uruguay</option>
+            <option value="Artigas" {% if existing_data and existing_data.residence == 'Artigas' %}selected{% endif %}>Artigas</option>
+            <option value="Canelones" {% if existing_data and existing_data.residence == 'Canelones' %}selected{% endif %}>Canelones</option>
+            <option value="Cerro Largo" {% if existing_data and existing_data.residence == 'Cerro Largo' %}selected{% endif %}>Cerro Largo</option>
+            <option value="Colonia" {% if existing_data and existing_data.residence == 'Colonia' %}selected{% endif %}>Colonia</option>
+            <option value="Durazno" {% if existing_data and existing_data.residence == 'Durazno' %}selected{% endif %}>Durazno</option>
+            <option value="Flores" {% if existing_data and existing_data.residence == 'Flores' %}selected{% endif %}>Flores</option>
+            <option value="Florida" {% if existing_data and existing_data.residence == 'Florida' %}selected{% endif %}>Florida</option>
+            <option value="Lavalleja" {% if existing_data and existing_data.residence == 'Lavalleja' %}selected{% endif %}>Lavalleja</option>
+            <option value="Maldonado" {% if existing_data and existing_data.residence == 'Maldonado' %}selected{% endif %}>Maldonado</option>
+            <option value="Montevideo" {% if existing_data and existing_data.residence == 'Montevideo' %}selected{% endif %}>Montevideo</option>
+            <option value="Paysandú" {% if existing_data and existing_data.residence == 'Paysandú' %}selected{% endif %}>Paysandú</option>
+            <option value="Río Negro" {% if existing_data and existing_data.residence == 'Río Negro' %}selected{% endif %}>Río Negro</option>
+            <option value="Rivera" {% if existing_data and existing_data.residence == 'Rivera' %}selected{% endif %}>Rivera</option>
+            <option value="Rocha" {% if existing_data and existing_data.residence == 'Rocha' %}selected{% endif %}>Rocha</option>
+            <option value="Salto" {% if existing_data and existing_data.residence == 'Salto' %}selected{% endif %}>Salto</option>
+            <option value="San José" {% if existing_data and existing_data.residence == 'San José' %}selected{% endif %}>San José</option>
+            <option value="Soriano" {% if existing_data and existing_data.residence == 'Soriano' %}selected{% endif %}>Soriano</option>
+            <option value="Tacuarembó" {% if existing_data and existing_data.residence == 'Tacuarembó' %}selected{% endif %}>Tacuarembó</option>
+            <option value="Treinta y Tres" {% if existing_data and existing_data.residence == 'Treinta y Tres' %}selected{% endif %}>Treinta y Tres</option>
         </select><br><br>
 
         <label for="email" class="info-q">7. Mail:</label><br>
-        <input type="email" id="email" name="email" required><br><br>
+        <input type="email" id="email" name="email" value="{{ existing_data.email if existing_data else '' }}" required><br><br>
 
         <label for="phone" class="info-q">8. Teléfono:</label><br>
-        <input type="tel" id="phone" name="phone" required><br><br>
+        <input type="tel" id="phone" name="phone" value="{{ existing_data.phone if existing_data else '' }}" required><br><br>
 
         <hr>
         <h3>Salud Mental</h3>
@@ -173,6 +178,11 @@
     </main>
 
     <script>
+    // Inicializar el formulario al cargar la página
+    window.onload = function() {
+        genderCheck();
+    };
+
     function genderCheck() {
         var sd = document.getElementById('self_describe');
         var div_pref = document.getElementById('div-prefiero');

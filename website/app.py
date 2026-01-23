@@ -74,7 +74,7 @@ db_config = {
     'user': db_user,
     'password': db_pass,
     #'password': 'goU0oLgYwsc4JXiA_',
-    'database': 'emar'
+    'database': 'canna_emar'
 }
 
 
@@ -105,6 +105,57 @@ def validate_participant_id(participant_id):
     except Error as e:
         print(f"Error validating participant_id: {e}")
         return False, None
+
+
+def get_participant_data_ronda1(participant_id):
+    """Obtiene los datos del participante de Ronda 1 para pre-llenar el formulario"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Buscar los datos del participante en la tabla de ronda 1
+        sql = """SELECT name, age, sex, education_level, country_of_origin, 
+                        residence, email, phone 
+                 FROM sociodemographic_data_ronda1 
+                 WHERE participant_id = %s"""
+        cursor.execute(sql, (participant_id,))
+        result = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        if result:
+            # Convertir tupla a diccionario
+            # Orden: name, age, sex, education_level, country_of_origin, residence, email, phone
+            name, age, sex, education_level, country_of_origin, residence, email, phone = result
+            
+            # Procesar el campo sex si tiene "Prefiero autodescribirme: texto"
+            sex_value = sex or ''
+            prefiero_text = ''
+            if sex_value and 'Prefiero autodescribirme' in sex_value:
+                if ':' in sex_value:
+                    parts = sex_value.split(':', 1)
+                    sex_value = 'Prefiero autodescribirme'
+                    prefiero_text = parts[1].strip()
+                else:
+                    sex_value = 'Prefiero autodescribirme'
+            
+            return {
+                'name': name or '',
+                'age': age or '',
+                'sex': sex_value,
+                'prefiero_text': prefiero_text,
+                'education_level': education_level or '',
+                'country_of_origin': country_of_origin or '',
+                'residence': residence or '',
+                'email': email or '',
+                'phone': phone or ''
+            }
+        else:
+            return None
+    except Error as e:
+        print(f"Error getting participant data: {e}")
+        return None
 
 
 
@@ -183,8 +234,15 @@ def sociodemo():
         # Si no está validado, redirigir a welcome
         return redirect(url_for('welcome'))
     
+    participant_id = session.get('participant_id')
     participant_name = session.get('participant_name', '')
-    return render_template('sociodemo.html', participant_name=participant_name)
+    
+    # Cargar datos de Ronda 1 para pre-llenar el formulario
+    existing_data = get_participant_data_ronda1(participant_id)
+    
+    return render_template('sociodemo.html', 
+                         participant_name=participant_name,
+                         existing_data=existing_data)
 
 @app.route('/submit-sociodemo', methods=['POST'])
 def submit_sociodemo():
