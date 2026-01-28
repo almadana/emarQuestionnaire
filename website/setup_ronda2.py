@@ -2,14 +2,11 @@
 """
 Script para configurar la migración de Ronda 1 a Ronda 2
 
-PROCESO:
-1. En canna_emar (Ronda 1):
-   - Mantener sociodemographic_data (con datos históricos)
-   - Vaciar todas las demás tablas
-
-2. En emar (Ronda 2):
-   - Copiar sociodemographic_data de canna_emar a sociodemographic_data_ronda1
-   - Crear/actualizar sociodemographic_data con estructura nueva de Ronda 2
+PROCESO (todo en la base emar):
+1. Copiar sociodemographic_data a sociodemographic_data_ronda1 (para validación)
+2. Vaciar TODAS las tablas (incluyendo sociodemographic_data)
+3. Solo se preserva sociodemographic_data_ronda1 (para validación de participant_ids)
+4. Las tablas quedan listas para empezar Ronda 2 desde cero
 """
 
 import mysql.connector
@@ -21,12 +18,11 @@ with open('db_credentials.txt', 'r') as file:
     db_user = lines[0].strip()
     db_pass = lines[1].strip()
 
-# Configuración de bases de datos
-DB_RONDA1 = 'canna_emar'  # Base de datos de Ronda 1
-DB_RONDA2 = 'emar'        # Base de datos de Ronda 2
+# Configuración de base de datos
+DATABASE = 'emar'  # Única base de datos
 
-# Tabla que se preserva en Ronda 1
-TABLA_PRESERVAR = 'sociodemographic_data'
+# Tabla que se preserva (solo para validación)
+TABLA_PRESERVAR = 'sociodemographic_data_ronda1'
 
 # Tablas que se crean en Ronda 2 (según create_tables.py)
 TABLAS_RONDA2 = [
@@ -44,7 +40,7 @@ TABLAS_RONDA2 = [
 
 def get_all_tables(cursor, database):
     """Obtiene lista de todas las tablas en una base de datos"""
-    cursor.execute(f"SHOW TABLES FROM {database}")
+    cursor.execute("SHOW TABLES")
     tables = [row[0] for row in cursor.fetchall()]
     return tables
 
@@ -68,29 +64,35 @@ def vaciar_tabla(cursor, table):
         return False
 
 
-def copiar_sociodemo_ronda1_a_ronda2(cursor_ronda1, cursor_ronda2):
-    """Copia datos de sociodemographic_data de Ronda 1 a sociodemographic_data_ronda1 en Ronda 2"""
-    print("\n📋 Paso 1: Copiando datos sociodemográficos de Ronda 1...")
+def copiar_sociodemo_a_ronda1(cursor):
+    """Copia datos de sociodemographic_data a sociodemographic_data_ronda1 (en la misma base)"""
+    print("\n📋 Paso 1: Copiando datos sociodemográficos a tabla de referencia...")
     
-    # Leer datos de Ronda 1
-    cursor_ronda1.execute("""
+    # Verificar que existe la tabla origen
+    cursor.execute("SHOW TABLES LIKE 'sociodemographic_data'")
+    if not cursor.fetchone():
+        print("   ❌ La tabla sociodemographic_data no existe")
+        return 0
+    
+    # Leer datos
+    cursor.execute("""
         SELECT participant_id, name, age, sex, education_level, 
                country_of_origin, years_in_uruguay, residence, 
                email, phone, ejer_sino, ejer_freq
         FROM sociodemographic_data
     """)
     
-    rows = cursor_ronda1.fetchall()
-    print(f"   ✓ Encontrados {len(rows)} participantes en Ronda 1")
+    rows = cursor.fetchall()
+    print(f"   ✓ Encontrados {len(rows)} participantes")
     
     if len(rows) == 0:
         print("   ⚠️  No hay datos para copiar")
         return 0
     
     # Verificar que existe la tabla destino
-    cursor_ronda2.execute("SHOW TABLES LIKE 'sociodemographic_data_ronda1'")
-    if not cursor_ronda2.fetchone():
-        print("   ❌ La tabla sociodemographic_data_ronda1 no existe en Ronda 2")
+    cursor.execute("SHOW TABLES LIKE 'sociodemographic_data_ronda1'")
+    if not cursor.fetchone():
+        print("   ❌ La tabla sociodemographic_data_ronda1 no existe")
         print("      Ejecuta primero: python3 create_tables.py")
         return 0
     
@@ -105,7 +107,7 @@ def copiar_sociodemo_ronda1_a_ronda2(cursor_ronda1, cursor_ronda2):
     skipped = 0
     for row in rows:
         try:
-            cursor_ronda2.execute(sql, row)
+            cursor.execute(sql, row)
             count += 1
         except Error as e:
             if 'Duplicate entry' in str(e):
@@ -120,26 +122,19 @@ def copiar_sociodemo_ronda1_a_ronda2(cursor_ronda1, cursor_ronda2):
     return count
 
 
-def limpiar_ronda1(cursor, database):
-    """Limpia todas las tablas de Ronda 1 excepto sociodemographic_data"""
-    print(f"\n🧹 Paso 2: Limpiando tablas en {database} (excepto {TABLA_PRESERVAR})...")
+def limpiar_otras_tablas(cursor, database):
+    """Limpia todas las tablas excepto sociodemographic_data_ronda1 (que se usa para validación)"""
+    print(f"\n🧹 Paso 2: Limpiando todas las tablas excepto sociodemographic_data_ronda1...")
     
     # Obtener todas las tablas
     tables = get_all_tables(cursor, database)
     
-    if TABLA_PRESERVAR not in tables:
-        print(f"   ⚠️  La tabla {TABLA_PRESERVAR} no existe")
-        return
-    
-    # Contar registros antes
-    records_before = count_records(cursor, TABLA_PRESERVAR)
-    print(f"   📊 Registros en {TABLA_PRESERVAR}: {records_before} (se preservan)")
-    
-    # Vaciar otras tablas
-    tables_to_clean = [t for t in tables if t != TABLA_PRESERVAR]
+    # Solo preservar sociodemographic_data_ronda1 (tabla de referencia para validación)
+    tables_to_preserve = ['sociodemographic_data_ronda1']
+    tables_to_clean = [t for t in tables if t not in tables_to_preserve]
     
     if not tables_to_clean:
-        print("   ✓ No hay otras tablas para limpiar")
+        print("   ✓ No hay tablas para limpiar")
         return
     
     print(f"   📋 Tablas a limpiar: {len(tables_to_clean)}")
@@ -151,11 +146,15 @@ def limpiar_ronda1(cursor, database):
                 print(f"      ✓ {table} limpiada")
         else:
             print(f"   ⏭️  {table} ya está vacía")
+    
+    # Verificar que sociodemographic_data_ronda1 se preservó
+    records_ronda1 = count_records(cursor, 'sociodemographic_data_ronda1')
+    print(f"\n   ✅ Tabla preservada: sociodemographic_data_ronda1 ({records_ronda1} registros)")
 
 
 def verificar_estructura_sociodemo_ronda2(cursor):
-    """Verifica y actualiza la estructura de sociodemographic_data en Ronda 2"""
-    print(f"\n🔧 Paso 3: Verificando estructura de sociodemographic_data en Ronda 2...")
+    """Verifica y actualiza la estructura de sociodemographic_data para Ronda 2"""
+    print(f"\n🔧 Paso 3: Verificando estructura de sociodemographic_data para Ronda 2...")
     
     # Verificar si la tabla existe
     cursor.execute("SHOW TABLES LIKE 'sociodemographic_data'")
@@ -168,7 +167,7 @@ def verificar_estructura_sociodemo_ronda2(cursor):
     cursor.execute("DESCRIBE sociodemographic_data")
     existing_columns = {row[0] for row in cursor.fetchall()}
     
-    # Campos nuevos que deben existir
+    # Campos nuevos que deben existir para Ronda 2
     required_new_fields = [
         'fam_hermano', 'fam_padre', 'fam_madre', 'fam_abuelo', 'fam_ninguno',
         'psicofarmacos', 'tiempo_psicofarmacos',
@@ -181,8 +180,9 @@ def verificar_estructura_sociodemo_ronda2(cursor):
     missing_fields = [f for f in required_new_fields if f not in existing_columns]
     
     if missing_fields:
-        print(f"   ⚠️  Faltan {len(missing_fields)} campos nuevos")
-        print("      Ejecuta: python3 create_tables.py para crear la estructura completa")
+        print(f"   ⚠️  Faltan {len(missing_fields)} campos nuevos de Ronda 2")
+        print("      Campos faltantes:", ', '.join(missing_fields[:5]), '...' if len(missing_fields) > 5 else '')
+        print("      Ejecuta: python3 create_tables.py para actualizar la estructura")
         return False
     else:
         print("   ✓ La tabla tiene todos los campos necesarios de Ronda 2")
@@ -195,15 +195,15 @@ def main():
     print("🔧 CONFIGURACIÓN DE MIGRACIÓN RONDA 1 → RONDA 2")
     print("=" * 70)
     print()
-    print(f"📖 Base de datos Ronda 1: {DB_RONDA1}")
-    print(f"📝 Base de datos Ronda 2: {DB_RONDA2}")
+    print(f"📊 Base de datos: {DATABASE}")
     print()
     print("Este script realizará:")
-    print("  1. Copiar sociodemographic_data de Ronda 1 a sociodemographic_data_ronda1 en Ronda 2")
-    print(f"  2. Limpiar todas las tablas en {DB_RONDA1} excepto sociodemographic_data")
-    print("  3. Verificar estructura de sociodemographic_data en Ronda 2")
+    print("  1. Copiar sociodemographic_data a sociodemographic_data_ronda1 (para validación)")
+    print(f"  2. Limpiar TODAS las tablas en {DATABASE} excepto sociodemographic_data_ronda1")
+    print("  3. Verificar estructura de sociodemographic_data para Ronda 2")
     print()
-    print("⚠️  ADVERTENCIA: Se eliminarán datos de tablas en Ronda 1 (excepto sociodemographic_data)")
+    print("⚠️  ADVERTENCIA: Se eliminarán TODOS los datos de todas las tablas")
+    print("   Solo se preservará: sociodemographic_data_ronda1 (para validación)")
     print()
     
     respuesta = input("¿Continuar? (s/n): ")
@@ -211,69 +211,51 @@ def main():
         print("❌ Cancelado.")
         return
     
-    conn_ronda1 = None
-    conn_ronda2 = None
+    conn = None
     
     try:
-        # Conectar a Ronda 1
-        print(f"\n📖 Conectando a {DB_RONDA1}...")
-        conn_ronda1 = mysql.connector.connect(
+        # Conectar a la base de datos
+        print(f"\n📊 Conectando a {DATABASE}...")
+        conn = mysql.connector.connect(
             host='127.0.0.1',
             user=db_user,
             password=db_pass,
-            database=DB_RONDA1
+            database=DATABASE
         )
-        cursor_ronda1 = conn_ronda1.cursor()
-        print("✓ Conectado a Ronda 1")
-        
-        # Conectar a Ronda 2
-        print(f"\n📝 Conectando a {DB_RONDA2}...")
-        conn_ronda2 = mysql.connector.connect(
-            host='127.0.0.1',
-            user=db_user,
-            password=db_pass,
-            database=DB_RONDA2
-        )
-        cursor_ronda2 = conn_ronda2.cursor()
-        print("✓ Conectado a Ronda 2")
+        cursor = conn.cursor()
+        print("✓ Conectado")
         
         # Paso 1: Copiar datos
-        copiados = copiar_sociodemo_ronda1_a_ronda2(cursor_ronda1, cursor_ronda2)
-        conn_ronda2.commit()
+        copiados = copiar_sociodemo_a_ronda1(cursor)
+        conn.commit()
         
-        # Paso 2: Limpiar Ronda 1
-        limpiar_ronda1(cursor_ronda1, DB_RONDA1)
-        conn_ronda1.commit()
+        # Paso 2: Limpiar otras tablas
+        limpiar_otras_tablas(cursor, DATABASE)
+        conn.commit()
         
-        # Paso 3: Verificar estructura Ronda 2
-        verificar_estructura_sociodemo_ronda2(cursor_ronda2)
+        # Paso 3: Verificar estructura
+        estructura_ok = verificar_estructura_sociodemo_ronda2(cursor)
         
         print("\n" + "=" * 70)
         print("✅ PROCESO COMPLETADO")
         print("=" * 70)
         print(f"\n📊 Resumen:")
-        print(f"   - Participantes copiados: {copiados}")
-        print(f"   - Base {DB_RONDA1}: sociodemographic_data preservada, otras tablas limpiadas")
-        print(f"   - Base {DB_RONDA2}: lista para Ronda 2")
-        print()
-        print("⚠️  IMPORTANTE: Verifica que la estructura de sociodemographic_data")
-        print("   en Ronda 2 tenga todos los campos nuevos. Si falta, ejecuta:")
-        print("   python3 create_tables.py")
+        print(f"   - Participantes copiados a sociodemographic_data_ronda1: {copiados}")
+        print(f"   - Base {DATABASE}: Solo sociodemographic_data_ronda1 preservada, todas las demás tablas limpiadas")
+        if not estructura_ok:
+            print()
+            print("⚠️  IMPORTANTE: La estructura de sociodemographic_data necesita actualizarse")
+            print("   Ejecuta: python3 create_tables.py para agregar los campos de Ronda 2")
         
     except Error as e:
         print(f"\n❌ Error: {e}")
-        if conn_ronda1:
-            conn_ronda1.rollback()
-        if conn_ronda2:
-            conn_ronda2.rollback()
+        if conn:
+            conn.rollback()
     finally:
-        if conn_ronda1 and conn_ronda1.is_connected():
-            cursor_ronda1.close()
-            conn_ronda1.close()
-        if conn_ronda2 and conn_ronda2.is_connected():
-            cursor_ronda2.close()
-            conn_ronda2.close()
-        print("\n🔌 Conexiones cerradas")
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+        print("\n🔌 Conexión cerrada")
 
 
 if __name__ == "__main__":
